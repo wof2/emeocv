@@ -29,23 +29,35 @@ public:
     void showImage();
     void saveConfig();
     void loadConfig();
+    cv::Mat resize(cv::Mat & image, cv::Size size);
+	cv::Mat replaceRedWithBlack(cv::Mat& img);
+
+    float static getLinePointAvgY(cv::Vec2f line);
 
 private:
     void rotate(double rotationDegrees);
     void findCounterDigits();
+	std::vector<cv::Rect> findAlignedBoxesFromCounterArea(cv::Mat edges);
+    cv::Rect findCounterArea(cv::Mat & edges);
+    
+    
     void findAlignedBoxes(std::vector<cv::Rect>::const_iterator begin,
             std::vector<cv::Rect>::const_iterator end, std::vector<cv::Rect>& result);
     float detectSkew();
     void drawLines(std::vector<cv::Vec2f>& lines);
     void drawLines(std::vector<cv::Vec4i>& lines, int xoff=0, int yoff=0);
-    cv::Mat cannyEdges();
+    cv::Mat cannyEdges(cv::Mat & image, int lower, int upper);
+	
+	void createGray();
     void filterContours(std::vector<std::vector<cv::Point> >& contours, std::vector<cv::Rect>& boundingBoxes,
             std::vector<std::vector<cv::Point> >& filteredContours);
 
     cv::Mat _img;
     cv::Mat _imgGray;
+	 cv::Rect2d _digitsRegion;
     std::vector<cv::Mat> _digits;
     Config _config;
+    const int _maxImageHeight = 600;
     bool _debugWindow;
     bool _debugSkew;
     bool _debugEdges;

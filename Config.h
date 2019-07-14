@@ -14,11 +14,11 @@ public:
     void saveConfig();
     void loadConfig();
 
-    int getDigitMaxHeight() const {
+    float getDigitMaxHeight() const {
         return _digitMaxHeight;
     }
 
-    int getDigitMinHeight() const {
+    float getDigitMinHeight() const {
         return _digitMinHeight;
     }
 
@@ -49,8 +49,8 @@ public:
 private:
     int _rotationDegrees;
     float _ocrMaxDist;
-    int _digitMinHeight;
-    int _digitMaxHeight;
+    float _digitMinHeight;
+    float _digitMaxHeight;
     int _digitYAlignment;
     int _cannyThreshold1;
     int _cannyThreshold2;

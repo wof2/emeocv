@@ -111,10 +111,14 @@ static void learnOcr(ImageInput* pImageInput) {
 }
 
 static void adjustCamera(ImageInput* pImageInput) {
-    log4cpp::Category::getRoot().info("adjustCamera");
 
+    log4cpp::Category::getRoot().info("adjustCamera");
+  
+    
     Config config;
+    
     config.loadConfig();
+  
     ImageProcessor proc(config);
     proc.debugWindow();
     proc.debugDigits();
@@ -144,6 +148,7 @@ static void adjustCamera(ImageInput* pImageInput) {
         } else if (key == 'p') {
             processImage = true;
         }
+
     }
     if (key != 'q') {
         std::cout << "Saving config\n";
@@ -248,7 +253,7 @@ int main(int argc, char **argv) {
     while ((opt = getopt(argc, argv, "i:c:ltaws:o:v:h")) != -1) {
         switch (opt) {
             case 'i':
-                pImageInput = new DirectoryInput(Directory(optarg, ".png"));
+                pImageInput = new DirectoryInput(Directory(optarg, ".jpg"));
                 inputCount++;
                 break;
             case 'c':

@@ -8,9 +8,9 @@
 #include "Config.h"
 
 Config::Config() :
-        _rotationDegrees(0), _ocrMaxDist(5e5), _digitMinHeight(20), _digitMaxHeight(
-                90), _digitYAlignment(10), _cannyThreshold1(100), _cannyThreshold2(
-                200), _trainingDataFilename("trainctr.yml") {
+        _rotationDegrees(-90), _ocrMaxDist(5e5), _digitMinHeight(0.04f), _digitMaxHeight(0.075f
+                ), _digitYAlignment(10), _cannyThreshold1(160), _cannyThreshold2(
+                255), _trainingDataFilename("trainctr.yml") {
 }
 
 void Config::saveConfig() {
