@@ -5,6 +5,10 @@ PROJECT = emeocv
 OBJS = $(addprefix $(OUTDIR)/,\
   Directory.o \
   Config.o \
+  SortUtils.o \
+  AbstractDigitBoundingBoxesExtractor.o \
+  EvenSpacingBoundingBoxExtractor.o \
+  AutomaticBoundingBoxExtractor.o \
   ImageProcessor.o \
   ImageInput.o \
   KNearestOcr.o \

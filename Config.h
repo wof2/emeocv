@@ -8,42 +8,55 @@
 
 #include <string>
 
-class Config {
+class Config
+{
 public:
     Config();
     void saveConfig();
     void loadConfig();
 
-    float getDigitMaxHeight() const {
-        return _digitMaxHeight;
+    float getDigitMaxHeight() const
+    {
+	return _digitMaxHeight;
     }
 
-    float getDigitMinHeight() const {
-        return _digitMinHeight;
+    float getDigitMinHeight() const
+    {
+	return _digitMinHeight;
     }
 
-    int getDigitYAlignment() const {
-        return _digitYAlignment;
+    int getDigitYAlignment() const
+    {
+	return _digitYAlignment;
     }
 
-    std::string getTrainingDataFilename() const {
-        return _trainingDataFilename;
+    std::string getTrainingDataFilename() const
+    {
+	return _trainingDataFilename;
     }
 
-    float getOcrMaxDist() const {
-        return _ocrMaxDist;
+    float getOcrMaxDist() const
+    {
+	return _ocrMaxDist;
     }
 
-    int getRotationDegrees() const {
-        return _rotationDegrees;
+    int getRotationDegrees() const
+    {
+	return _rotationDegrees;
     }
 
-    int getCannyThreshold1() const {
-        return _cannyThreshold1;
+    int getCannyThreshold1() const
+    {
+	return _cannyThreshold1;
     }
 
-    int getCannyThreshold2() const {
-        return _cannyThreshold2;
+    int getCannyThreshold2() const
+    {
+	return _cannyThreshold2;
+    }
+	int getDigitCount() const
+    {
+		return _digitCount;
     }
 
 private:
@@ -55,6 +68,8 @@ private:
     int _cannyThreshold1;
     int _cannyThreshold2;
     std::string _trainingDataFilename;
+    const int _digitCount = 7;
+  
 };
 
 #endif /* CONFIG_H_ */
