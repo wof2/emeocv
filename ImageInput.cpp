@@ -13,6 +13,8 @@
 
 #include <log4cpp/Category.hh>
 #include <log4cpp/Priority.hh>
+#include <libexif/exif-data.h>
+#include <libexif/exif-utils.h>
 
 #include "ImageInput.h"
 
@@ -49,15 +51,8 @@ DirectoryInput::DirectoryInput(const Directory& directory) :
     _itFilename = _filenameList.begin();
 }
 
-bool DirectoryInput::nextImage() {
-    if (_itFilename == _filenameList.end()) {
-        return false;
-    }
-    std::string path = _directory.fullpath(*_itFilename);
-
-    _img = cv::imread(path.c_str());
-
-    // read time from file name
+tm DirectoryInput::readFilenameDate(const std::string filename) {
+	  // read time from file name
     struct tm date;
     memset(&date, 0, sizeof(date));
     date.tm_year = atoi(_itFilename->substr(0, 4).c_str()) - 1900;
@@ -66,6 +61,50 @@ bool DirectoryInput::nextImage() {
     date.tm_hour = atoi(_itFilename->substr(9, 2).c_str());
     date.tm_min = atoi(_itFilename->substr(11, 2).c_str());
     date.tm_sec = atoi(_itFilename->substr(13, 2).c_str());
+	return date;
+}
+
+tm DirectoryInput::readExifCreatedDate(const std::string fullpath) {
+	
+	ExifData *exifData = exif_data_new_from_file((fullpath).c_str());
+	if (exifData) {
+    ExifByteOrder byteOrder = exif_data_get_byte_order(exifData);
+	
+    ExifEntry *exifEntry = exif_data_get_entry(exifData,
+                                               EXIF_TAG_DATE_TIME_ORIGINAL);
+			
+	char buf[1024];
+	exif_entry_get_value(exifEntry, buf, sizeof(buf));			
+	struct tm date;
+    memset(&date, 0, sizeof(date));
+	std::string bufstr(buf);
+    date.tm_year = atoi(bufstr.substr(0, 4).c_str()) - 1900;
+    date.tm_mon = atoi(bufstr.substr(5, 2).c_str());
+    date.tm_mday = atoi(bufstr.substr(8, 2).c_str());
+    date.tm_hour = atoi(bufstr.substr(11, 2).c_str());
+    date.tm_min = atoi(bufstr.substr(14, 2).c_str());
+    date.tm_sec = atoi(bufstr.substr(17, 2).c_str());
+ //   if (exifEntry)
+  //    ExifSRational ret = exif_get_srational(exifEntry->data, byteOrder);
+
+	//std::cout<<orientation;
+    exif_data_free(exifData);
+	return date;
+  }
+}
+
+bool DirectoryInput::nextImage() {
+    if (_itFilename == _filenameList.end()) {
+        return false;
+    }
+    std::string path = _directory.fullpath(*_itFilename);
+
+    _img = cv::imread(path.c_str());
+
+	tm date = DirectoryInput::readExifCreatedDate(path);
+//tm date2 = DirectoryInput::readFilenameDate(*_itFilename);
+	
+	
     _time = mktime(&date);
 
     log4cpp::Category::getRoot() << log4cpp::Priority::INFO << "Processing " << *_itFilename << " of " << ctime(&_time);

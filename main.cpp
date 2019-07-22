@@ -32,7 +32,9 @@
 #include "Plausi.h"
 #include "RRDatabase.h"
 
+
 static int delay = 1000;
+
 
 #ifndef VERSION
 #define VERSION "0.9.7"
@@ -241,7 +243,10 @@ static void configureLogging(const std::string & priority = "INFO", bool toConso
     }
 }
 
+
 int main(int argc, char **argv) {
+	
+	
     int opt;
     ImageInput* pImageInput = 0;
     int inputCount = 0;

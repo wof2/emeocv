@@ -40,11 +40,38 @@ KNearestOcr::~KNearestOcr() {
 int KNearestOcr::learn(const cv::Mat & img) {
     cv::imshow("Learn", img);
     int key = cv::waitKey(0) & 255;
+	switch(key) {
+		case 176: key = 48; // zero on numpad
+		break;
+		case 177: key = 49; // 1 on numpad
+		break;
+		case 178: key = 50; // 2 on numpad
+		break;
+		case 179: key = 51; // 3 on numpad
+		break;
+		case 180: key = 52; // 4 on numpad
+		break;
+		case 181: key = 53; // 5 on numpad
+		break;
+		case 182: key = 54; // 6 on numpad
+		break;
+		case 183: key = 55; // 7 on numpad
+		break;
+		case 184: key = 56; // 8 on numpad
+		break;
+		case 185: key = 57; // 9 on numpad
+		break;
+	}
+	std::cout<< "Key pressed  "<<char(key)<<"\n";
     if (key >= '0' && key <= '9') {
         _responses.push_back(cv::Mat(1, 1, CV_32F, (float) key - '0'));
         _samples.push_back(prepareSample(img));
-    }
-
+		std::cout<< "Learned so far: "<<_responses.size()<<"\n";
+		//saveTrainingData();
+    }else if (key != 's' && key != 'q' ){
+		std::cout<< "Unrecognized key pressed. Only 1-9, 's','q' are allowed \n";
+	}
+	
     return key;
 }
 
@@ -115,7 +142,16 @@ char KNearestOcr::recognize(const cv::Mat& img) {
                 && dists.at<float>(0, 0) < _config.getOcrMaxDist()) {
             // valid character if both neighbors have the same value and distance is below ocrMaxDist
             cres = '0' + (int) result;
-        } else if (rlog.isInfoEnabled()) {
+        }else if (0 != int(neighborResponses.at<float>(0, 0) - neighborResponses.at<float>(0, 1))
+                && (dists.at<float>(0, 0) == 0 || dists.at<float>(0, 1) == 0)) {
+            // valid character if neighbours are different but one distance is 0 
+			//rlog<< log4cpp::Priority::DEBUG <<" Neigh 0: "<<int(neighborResponses.at<float>(0, 0) << " neigh 1: "<<int(neighborResponses.at<float>(0, 1) 
+			
+			result =  dists.at<float>(0, 0) == 0 ? int(neighborResponses.at<float>(0, 0)) : int(neighborResponses.at<float>(0, 1) );
+            cres = '0' + (int) result;
+        }
+		
+		else if (rlog.isInfoEnabled()) {
             rlog << log4cpp::Priority::INFO << "OCR rejected: " << (int) result;
         }
         rlog << log4cpp::Priority::DEBUG << "results: " << results;
@@ -144,8 +180,22 @@ std::string KNearestOcr::recognize(const std::vector<cv::Mat>& images) {
  */
 cv::Mat KNearestOcr::prepareSample(const cv::Mat& img) {
     cv::Mat roi, sample;
-    cv::resize(img, roi, cv::Size(10, 10));
+	//cv::imshow("img ", img);
+  //    cv::resize(img, roi, cv::Size(28, 28));
+
+    cv::resize(img, roi, cv::Size(28, 28), cv::INTER_AREA );
+//	cv::imshow("img resize", roi);
+    
+//	cv::dilate(roi,  roidil, cv::getStructuringElement(cv::MORPH_RECT,cv::Size(3,3)));//, cv::Size(3,3));
+//	cv::imshow("roidil", roidil);
+  
+//	    roi = cv2.resize(roi, (28, 28), interpolation=cv2.INTER_AREA)
+   //         roi = cv2.dilate(roi, (3, 3))
+	
     roi.reshape(1, 1).convertTo(sample, CV_32F);
+	
+//	cv::waitKey(1);
+	
     return sample;
 }
 

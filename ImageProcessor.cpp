@@ -17,10 +17,11 @@
 #include "ImageProcessor.h"
 #include "Config.h"
 #include "EvenSpacingBoundingBoxExtractor.h"
-
+#include "AutomaticBoundingBoxExtractor.h"
+#include "SortUtils.h"
 
 ImageProcessor::ImageProcessor(const Config & config) :
-        _config(config), _debugWindow(true), _debugSkew(false), _debugDigits(true), _debugEdges(false) {
+        _config(config), _debugWindow(true), _debugSkew(false), _debugDigits(true), _debugEdges(true) {
 }
 
 
@@ -84,7 +85,8 @@ void ImageProcessor::createGray() {
  */
 void ImageProcessor::process() {
     _digits.clear();
-	_boundingBoxExtractor = new EvenSpacingBoundingBoxExtractor(_config);
+	//_boundingBoxExtractor = new EvenSpacingBoundingBoxExtractor(_config);
+	_boundingBoxExtractor = new AutomaticBoundingBoxExtractor(_config);
     log4cpp::Category& rlog = log4cpp::Category::getRoot();        
         
     if(_img.rows > _maxImageHeight) {
@@ -96,10 +98,15 @@ void ImageProcessor::process() {
         _img = resize(mat, size);
 
     }
-	
-	
-    
 	createGray();
+	int morph_size = 1;
+	cv::Mat kernel = cv::getStructuringElement( 2, cv::Size( 2*morph_size + 1, 2*morph_size+1 ), cv::Point( morph_size, morph_size ) );	
+	cv::morphologyEx(_imgGray, _imgGray, cv::MORPH_OPEN, kernel);	
+	//cv::imshow("Thresholded", _imgGray);
+	//cv::waitKey(0);
+	//return;
+    
+	
 
     // initial rotation to get the digits up
     rotate(_config.getRotationDegrees());
@@ -307,7 +314,7 @@ void ImageProcessor::findCounterDigits() {
     log4cpp::Category& rlog = log4cpp::Category::getRoot();
 
     _digitsRegion = findCounterArea(_img);	
-	//_img = replaceRedWithBlack(_img);
+	_img = replaceRedWithBlack(_img);
 	//createGray();
 	
 	cv::Mat edges = cannyEdges(_imgGray, _config.getCannyThreshold1(), _config.getCannyThreshold2());

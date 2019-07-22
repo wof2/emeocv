@@ -16,7 +16,7 @@ public:
 
 private:
 	std::vector<cv::Rect> find(cv::Mat counterArea);
-	void filterContours(std::vector<std::vector<cv::Point>>& contours,
+	void filterContours(cv::Mat& counterArea, std::vector<std::vector<cv::Point>>& contours,
         std::vector<cv::Rect>& boundingBoxes,
         std::vector<std::vector<cv::Point>>& filteredContours);
 	void findAlignedBoxes(std::vector<cv::Rect>::const_iterator begin,

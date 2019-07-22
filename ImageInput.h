@@ -42,6 +42,8 @@ private:
     Directory _directory;
     std::list<std::string>::const_iterator _itFilename;
     std::list<std::string> _filenameList;
+	tm readExifCreatedDate(const std::string fullpath);
+	tm readFilenameDate(const std::string filename);
 };
 
 class CameraInput: public ImageInput {

@@ -33,7 +33,7 @@ std::vector<cv::Rect> AutomaticBoundingBoxExtractor::find(cv::Mat counterArea) {
         cv::imshow("contours before", contb);
     }
     // filter contours by bounding rect size
-    filterContours(contours, boundingBoxes, filteredContours);
+    filterContours(counterArea, contours, boundingBoxes, filteredContours);
 
     // find bounding boxes that are aligned at y position
     std::vector<cv::Rect> alignedBoundingBoxes, tmpRes;
@@ -56,7 +56,7 @@ std::vector<cv::Rect> AutomaticBoundingBoxExtractor::find(cv::Mat counterArea) {
 /**
  * Filter contours by size of bounding rectangle.
  */
-void AutomaticBoundingBoxExtractor::filterContours(std::vector<std::vector<cv::Point> >& contours,
+void AutomaticBoundingBoxExtractor::filterContours(cv::Mat& counterArea, std::vector<std::vector<cv::Point> >& contours,
         std::vector<cv::Rect>& boundingBoxes, std::vector<std::vector<cv::Point> >& filteredContours) {
     // filter contours by bounding rect size
     log4cpp::Category& rlog = log4cpp::Category::getRoot();
@@ -75,8 +75,8 @@ void AutomaticBoundingBoxExtractor::filterContours(std::vector<std::vector<cv::P
 	for (size_t i = 0; i < tmpBoxes.size(); i++) {			
 		cv::Rect bounds = tmpBoxes[i];		
 		 rlog << log4cpp::Priority::INFO << "bounding : " << bounds;                    
-        if (bounds.height > 0.25f *_digitsRegion.height && bounds.height < 0.9f *_digitsRegion.height
-                && bounds.width > 4 && bounds.width < bounds.height) {	
+        if (bounds.height > 0.25f *counterArea.rows && bounds.height < 0.9f *counterArea.rows
+                && bounds.width > 5 && bounds.width < bounds.height) {	
 			if(i>0) {		
 					boundingBoxes.push_back(bounds); 				
 			} else {			
@@ -86,14 +86,14 @@ void AutomaticBoundingBoxExtractor::filterContours(std::vector<std::vector<cv::P
 		//rlog << log4cpp::Priority::INFO << "Qualifed region : " <<  (*ib);
 		//cv::rectangle(_img, *ib, cv::Scalar(255, 255, 0), 2);
 	}
-	if(_debugDigits) {
+	/*if(_debugDigits) {
 		for (size_t i = 0; i < boundingBoxes.size(); i++) {	
 			cv::Rect shifted = boundingBoxes[i];
 			shifted.x += _digitsRegion.x;
 			shifted.y += _digitsRegion.y;
 			cv::rectangle(_img,  shifted, cv::Scalar(0, 255, 0), 1);
 		}
-	}
+	}*/
 	
    
 }
@@ -109,17 +109,21 @@ void AutomaticBoundingBoxExtractor::findAlignedBoxes(std::vector<cv::Rect>::cons
     ++it;
     result.push_back(start);
 	cv::Rect lastRect;
-	
+	// area diff
     for (; it != end; ++it) {		
 		if (abs(start.y - it->y) < _config.getDigitYAlignment() && (1.0f*abs(start.height - it->height) / start.height) < 0.5f) {
-			if(lastRect.area() == 0) { // bo boxes so far
+			if(lastRect.area() == 0) { // no boxes so far
 				result.push_back(*it);
 				lastRect = *it;
 			}else{
-				float xdiff = abs(it->x - (lastRect.x + lastRect.width));
-				if(xdiff > (it->width + lastRect.width)*0.3f ) {
-					result.push_back(*it);
-					lastRect = *it;
+				float xdiff = abs(it->x - (lastRect.x + lastRect.width)); 
+				if(xdiff > (it->width + lastRect.width)*0.3f ) { // can't be packed too close together
+					float areaDiffPercentage = abs(lastRect.area() - it->area()) / it->area();
+					if(areaDiffPercentage < 0.3f){
+						result.push_back(*it);
+						lastRect = *it;
+					}
+					
 				}
 			}
 			

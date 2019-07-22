@@ -18,7 +18,7 @@ OBJS = $(addprefix $(OUTDIR)/,\
   )
 
 CC = g++
-CFLAGS = -Wno-write-strings -I . `pkg-config opencv --cflags`
+CFLAGS = -Wno-write-strings -I . `pkg-config opencv libexif --cflags`
 
 # DEBUG
 ifneq ($(RELEASE),true)
@@ -30,7 +30,7 @@ endif
 
 BIN := $(OUTDIR)/$(PROJECT)
 
-LDLIBS = `pkg-config opencv --libs` -lrrd -llog4cpp
+LDLIBS = `pkg-config opencv libexif --libs` -lrrd -llog4cpp 
 
 SUFFIXES= .cpp .o
 .SUFFIXES: $(SUFFIXES) .
