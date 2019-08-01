@@ -6,6 +6,7 @@ OBJS = $(addprefix $(OUTDIR)/,\
   Directory.o \
   Config.o \
   SortUtils.o \
+  RecognitionStats.o \
   AbstractDigitBoundingBoxesExtractor.o \
   EvenSpacingBoundingBoxExtractor.o \
   AutomaticBoundingBoxExtractor.o \

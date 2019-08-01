@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <exception>
+#include <chrono>  // for high_resolution_clock
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -21,7 +22,7 @@
 #include "SortUtils.h"
 
 ImageProcessor::ImageProcessor(const Config & config) :
-        _config(config), _debugWindow(true), _debugSkew(false), _debugDigits(true), _debugEdges(true) {
+        _config(config), _debugWindow(true), _debugSkew(false), _debugDigits(true), _debugEdges(false) {
 }
 
 
@@ -84,6 +85,8 @@ void ImageProcessor::createGray() {
  * Read input image and create vector of images for each digit.
  */
 void ImageProcessor::process() {
+	// Record start time
+	auto start = std::chrono::high_resolution_clock::now();	
     _digits.clear();
 	//_boundingBoxExtractor = new EvenSpacingBoundingBoxExtractor(_config);
 	_boundingBoxExtractor = new AutomaticBoundingBoxExtractor(_config);
@@ -105,8 +108,6 @@ void ImageProcessor::process() {
 	//cv::imshow("Thresholded", _imgGray);
 	//cv::waitKey(0);
 	//return;
-    
-	
 
     // initial rotation to get the digits up
     rotate(_config.getRotationDegrees());
@@ -118,10 +119,15 @@ void ImageProcessor::process() {
    
     // find and isolate counter digits
     findCounterDigits();
-
+	// Record end time
+	auto finish = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = finish - start;
+	std::cout << "Elapsed time: " << elapsed.count() << " s\n";
+	
     if (_debugWindow) {
         showImage();
     }
+	
 }
 
 /**
@@ -212,9 +218,9 @@ float ImageProcessor::detectSkew() {
 cv::Mat ImageProcessor::cannyEdges(cv::Mat & mat,  int lower, int upper) {
     cv::Mat edges;
     // detect edges
-      log4cpp::Category& rlog = log4cpp::Category::getRoot();
+    //  log4cpp::Category& rlog = log4cpp::Category::getRoot();
     
-        rlog << log4cpp::Priority::INFO << "Canny thresholds : " << lower << ", " <<upper;
+      //  rlog << log4cpp::Priority::INFO << "Canny thresholds : " << lower << ", " <<upper;
 
         cv::Canny(mat, edges, lower, upper);
     
@@ -235,18 +241,28 @@ cv::Mat ImageProcessor::resize(cv::Mat & image, cv::Size size) {
 
 
 cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
+	//_config.getCounterMarkerHLOW;
+	
 	log4cpp::Category& rlog = log4cpp::Category::getRoot();
-	cv::Scalar lower = cv::Scalar(40, 40, 100);
-	cv::Scalar upper = cv::Scalar(80, 255, 250);
+	cv::Scalar lower = cv::Scalar(_config.getCounterMarkerHLOW(), _config.getCounterMarkerSLOW(),  _config.getCounterMarkerVLOW());
+	cv::Scalar upper = cv::Scalar(_config.getCounterMarkerHHI(), 255, 250);
 	cv::Mat blur; 
 	cv::Mat hsv; 
-	cv::Mat thrs; 
+	cv::Mat thrs, thrsbw; 
 	cv::GaussianBlur(img, blur, cv::Size(5,5), 2);
 	//	cv::imshow("blur", blur);
 	cvtColor(blur, hsv, cv::COLOR_BGR2HSV);
 	cv::inRange(hsv, lower, upper, thrs);
-	
-	 
+	//cv::Mat thrs_channels[3];
+	//cv::split( thrs, thrs_channels );
+//imshow("before closing", thrs);
+
+	// remove noise by MORPH_CLOSE
+	int morph_size = 6;
+	cv::Mat kernel = cv::getStructuringElement( 2, cv::Size( 2*morph_size + 1, 2*morph_size+1 ), cv::Point( morph_size, morph_size ) );	
+	cv::morphologyEx(thrs, thrs, cv::MORPH_CLOSE, kernel);	
+//imshow("HSV to gray closed", thrs);
+
 	std::vector<std::vector<cv::Point> > contours, filteredContours;
     std::vector<cv::Rect> bb;
 
@@ -264,7 +280,7 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 			cv::Rect bounds = cv::boundingRect(approx);
 			if(bounds.area() > _img.rows * _img.cols * 0.005f) { // at least 0,5% of the image
  				bb.push_back(bounds);
-				rlog << log4cpp::Priority::INFO << " Square marker detected " << approx;					
+				rlog << log4cpp::Priority::DEBUG << " Square marker detected " << approx;					
 				cv::rectangle(img, cv::Point2f(bounds.x, bounds.y), cv::Point2f(bounds.x + bounds.width, bounds.y + bounds.height) , cv::Scalar(255,0,0), 2);
 		
 			}				
@@ -281,6 +297,7 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 	if(bb.size() != 2 ) {
 		rlog << log4cpp::Priority::ERROR << " Marker detection failed. Found " << contours.size() << " contours instead of 2";
 		cv::imshow("Image error", img);
+		cv::imshow("Image error - thrs", thrs);
 		cv::waitKey(0);
 //        exit(-1);
 		throw new cv::Exception();
@@ -302,7 +319,9 @@ cv::Mat ImageProcessor::replaceRedWithBlack(cv::Mat & img) {
     cv::bitwise_not(mask, mask);
 	cv::bitwise_not(mask2, mask2);
 	cv::bitwise_and(mask, mask2, maskOut);  
-	cv::imshow("Mask", maskOut);  
+	if(_debugEdges) {
+		cv::imshow("Red color removal mask", maskOut);
+	}  
     cv::bitwise_and(img, img, ret, maskOut);
    // #cv2.imshow("no red", res)
     return ret;
@@ -312,40 +331,41 @@ cv::Mat ImageProcessor::replaceRedWithBlack(cv::Mat & img) {
  */
 void ImageProcessor::findCounterDigits() {
     log4cpp::Category& rlog = log4cpp::Category::getRoot();
-
+//	_img = replaceRedWithBlack(_img);
     _digitsRegion = findCounterArea(_img);	
-	_img = replaceRedWithBlack(_img);
-	//createGray();
 	
-	cv::Mat edges = cannyEdges(_imgGray, _config.getCannyThreshold1(), _config.getCannyThreshold2());
-	if(_debugEdges){
-		cv::imshow("Edges", edges);	
+	//createGray();
+	cv::Mat smallGray = _imgGray(_digitsRegion);
+	
+	cv::Mat edges = cannyEdges(smallGray, _config.getCannyThreshold1(), _config.getCannyThreshold2());
+	
+	//cv::Mat edgesSmall = edges;
+  //  cv::Mat edgesSmall = edges(_digitsRegion);
+	if(_debugDigits) {
+		cv::imshow("CounterArea", edges);
 	}
 
-    cv::Mat edgesSmall = edges(_digitsRegion);
-    cv::imshow("CounterArea", edgesSmall);
-
-	 cv::waitKey(1);
+	//cv::waitKey(1);
        
-    edges = edgesSmall.clone();
-    cv::Mat img_ret = edges.clone();
+  //  edges = edgesSmall.clone();
+   // cv::Mat img_ret = edges.clone();
 	//std::vector<cv::Rect> alignedBoundingBoxes = findAlignedBoxesFromCounterArea(edges);
 	std::vector<cv::Rect> alignedBoundingBoxes = _boundingBoxExtractor->find(edges);
 	//std::vector<cv::Rect> alignedBoundingBoxes = findAlignedBoxesFromCounterAreaManual(edges);
 	
-	rlog << log4cpp::Priority::INFO << "max number of alignedBoxes: " << alignedBoundingBoxes.size();
+	rlog << log4cpp::Priority::DEBUG << "max number of alignedBoxes: " << alignedBoundingBoxes.size();
     // cut out found rectangles from edged image
     for (int i = 0; i < alignedBoundingBoxes.size(); ++i) {
         cv::Rect roi = alignedBoundingBoxes[i];
-        _digits.push_back(img_ret(roi));
+        _digits.push_back(edges(roi));
 
-        rlog << log4cpp::Priority::INFO << "Digit: " << i << " " << roi;
+        rlog << log4cpp::Priority::DEBUG << "Digit: " << i << " " << roi;
 		roi.x +=_digitsRegion.x;
         roi.y += _digitsRegion.y;
         if (_debugDigits) {
             cv::rectangle(_img, roi, cv::Scalar(255, 255, 0), 2);
             cv::putText(_img, std::to_string(i+1), cv::Point2d(roi.x, roi.y), cv::FONT_HERSHEY_PLAIN, 0.99f, cv::Scalar(0,0,255) );
-            cv::putText(_img, std::to_string(i+1)+": "+std::to_string(floor(1000*roi.height / _img.rows)/10 )+ "%", cv::Point2d(0.2f * _img.rows, (i+1) * (15)), cv::FONT_HERSHEY_PLAIN, 0.99f, cv::Scalar(0,0,255) );
+          //  cv::putText(_img, std::to_string(i+1)+": "+std::to_string(floor(1000*roi.height / _img.rows)/10 )+ "%", cv::Point2d(0.2f * _img.rows, (i+1) * (15)), cv::FONT_HERSHEY_PLAIN, 0.99f, cv::Scalar(0,0,255) );
          
         }
     }

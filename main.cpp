@@ -35,15 +35,13 @@
 
 static int delay = 1000;
 
-
 #ifndef VERSION
 #define VERSION "0.9.7"
 #endif
 
 static void testOcr(ImageInput* pImageInput) {
     log4cpp::Category::getRoot().info("testOcr");
-
-    Config config;
+	Config config;
     config.loadConfig();
     ImageProcessor proc(config);
     proc.debugWindow();
@@ -59,16 +57,26 @@ static void testOcr(ImageInput* pImageInput) {
     std::cout << "OCR training data loaded.\n";
     std::cout << "<q> to quit.\n";
 
-    while (pImageInput->nextImage()) {
+    while (pImageInput->nextImage()) {	
         proc.setInput(pImageInput->getImage());
         proc.process();
 
         std::string result = ocr.recognize(proc.getOutput());
         std::cout << result;
+				
         if (plausi.check(result, pImageInput->getTime())) {
+			
             std::cout << "  " << std::fixed << std::setprecision(1) << plausi.getCheckedValue() << std::endl;
         } else {
-            std::cout << "  -------" << std::endl;
+			
+			
+            std::cout << "  -------"; 
+			DirectoryInput* dirInput = dynamic_cast<DirectoryInput*>(pImageInput);
+			if (dirInput != nullptr) {
+				 std::cout << " " <<  dirInput->getCurrentFilename();;
+			}
+			std::cout << std::endl;
+			
         }
         int key = cv::waitKey(delay) & 255;
 
@@ -77,6 +85,8 @@ static void testOcr(ImageInput* pImageInput) {
             break;
         }
     }
+	
+	 std::cout << plausi.getStats() << std::endl;
 }
 
 static void learnOcr(ImageInput* pImageInput) {
@@ -112,6 +122,20 @@ static void learnOcr(ImageInput* pImageInput) {
     }
 }
 
+static void printStatistics() {
+	Config config;
+    config.loadConfig();
+   
+    KNearestOcr ocr(config);
+    if (! ocr.loadTrainingData()) {
+        std::cout << "Failed to load OCR training data. Use option -l to train the program\n";
+        return;
+    }
+	
+	
+    std::cout << "OCR stats:\n"<<ocr.getStatitics();
+   
+}
 static void adjustCamera(ImageInput* pImageInput) {
 
     log4cpp::Category::getRoot().info("adjustCamera");
@@ -193,10 +217,23 @@ static void writeData(ImageInput* pImageInput) {
     while (pImageInput->nextImage()) {
         proc.setInput(pImageInput->getImage());
         proc.process();
-
-        if (proc.getOutput().size() == 7) {
+		if (proc.getOutput().size() != config.getDigitCount()) {
+			plausi.registerNotRecognized();
+		}else{
             std::string result = ocr.recognize(proc.getOutput());
+			std::cout << "Result for plausi process: "<< result;;
+			DirectoryInput* dirInput = dynamic_cast<DirectoryInput*>(pImageInput);
+			if (dirInput != nullptr) {
+				 std::cout << " " <<  dirInput->getCurrentFilename();;
+			}
+			 std::cout << "\n";
             if (plausi.check(result, pImageInput->getTime())) {
+				char buff[20];
+				time_t now = plausi.getCheckedTime();
+				strftime(buff, 20, "%Y-%m-%d %H:%M:%S", localtime(&now));
+				
+				std::cout << "Saving record to RRD :"<<buff<<", value: "<<plausi.getCheckedValue()<<".\n";
+  
                 rrd.update(plausi.getCheckedTime(), plausi.getCheckedValue());
             }
         }
@@ -205,9 +242,10 @@ static void writeData(ImageInput* pImageInput) {
             pImageInput->setOutputDir("imgdebug");
             pImageInput->saveImage();
             pImageInput->setOutputDir("");
-        }
+        }		
         usleep(delay*1000L);
     }
+	std::cout << plausi.getStats() << std::endl;
 }
 
 static void usage(const char* progname) {
@@ -222,6 +260,7 @@ static void usage(const char* progname) {
     std::cout << "  -o <directory> : capture images into directory.\n";
     std::cout << "  -l : learn OCR.\n";
     std::cout << "  -t : test OCR.\n";
+    std::cout << "  -p : print OCR training set statistics.\n";
     std::cout << "  -w : write OCR data to RR database. This is the normal working mode.\n";
     std::cout << "\nOptions:\n";
     std::cout << "  -s <n> : Sleep n milliseconds after processing of each image (default=1000).\n";
@@ -255,7 +294,7 @@ int main(int argc, char **argv) {
     char cmd = 0;
     int cmdCount = 0;
 
-    while ((opt = getopt(argc, argv, "i:c:ltaws:o:v:h")) != -1) {
+    while ((opt = getopt(argc, argv, "i:c:ltaws:o:v:hp")) != -1) {
         switch (opt) {
             case 'i':
                 pImageInput = new DirectoryInput(Directory(optarg, ".jpg"));
@@ -265,9 +304,14 @@ int main(int argc, char **argv) {
                 pImageInput = new CameraInput(atoi(optarg));
                 inputCount++;
                 break;
+			 case 'p': 
+				printStatistics();
+				exit(EXIT_SUCCESS);
+				break;
             case 'l':
             case 't':
             case 'a':
+           
             case 'w':
                 cmd = opt;
                 cmdCount++;
@@ -319,7 +363,9 @@ int main(int argc, char **argv) {
             break;
         case 'w':
             writeData(pImageInput);
-            break;
+            break; 
+					
+			
     }
 
     delete pImageInput;

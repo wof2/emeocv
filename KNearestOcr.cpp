@@ -12,7 +12,8 @@
 
 #include <log4cpp/Category.hh>
 #include <log4cpp/Priority.hh>
-
+#include <map>
+#include <iostream>
 #include <exception>
 
 #include "KNearestOcr.h"
@@ -99,6 +100,37 @@ void KNearestOcr::saveTrainingData() {
     fs << "samples" << _samples;
     fs << "responses" << _responses;
     fs.release();
+}
+std::string KNearestOcr::getStatitics() {
+	if(!this->hasTrainingData()) {
+		throw new std::exception();
+	}
+	std::string ret;
+	cv::MatIterator_<cv::Mat> it; // = src_it.begin<cv::Vec3b>();
+	std::map<int, int> histogram;
+	ret.append("Trained responses: "); ret.append(std::to_string(_responses.rows));
+	ret.append("\n");
+	for(int i=0; i<_responses.rows; i++) {				
+		float value = _responses.at<float>(i,0);
+		int valueInt = (int)value;
+		 if (histogram.find(valueInt) != histogram.end()) {
+			 histogram[valueInt] ++;
+		 }else {
+			 histogram[valueInt] = 1;
+		 }
+	}
+	ret.append("Trained responses histogram:\n");
+	// Create a map iterator and point to beginning of map
+	std::map<int, int>::iterator it2 = histogram.begin();
+	while (it2 != histogram.end())
+	{	
+		ret.append("Digit '"+ std::to_string(it2->first)+"'->");		
+		ret.append(std::to_string(it2->second));
+		ret.append("\n");
+		it2++;
+	}
+	return ret;
+	
 }
 
 /**

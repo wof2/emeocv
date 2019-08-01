@@ -79,7 +79,7 @@ tm DirectoryInput::readExifCreatedDate(const std::string fullpath) {
     memset(&date, 0, sizeof(date));
 	std::string bufstr(buf);
     date.tm_year = atoi(bufstr.substr(0, 4).c_str()) - 1900;
-    date.tm_mon = atoi(bufstr.substr(5, 2).c_str());
+    date.tm_mon = atoi(bufstr.substr(5, 2).c_str()) - 1;
     date.tm_mday = atoi(bufstr.substr(8, 2).c_str());
     date.tm_hour = atoi(bufstr.substr(11, 2).c_str());
     date.tm_min = atoi(bufstr.substr(14, 2).c_str());
@@ -93,12 +93,15 @@ tm DirectoryInput::readExifCreatedDate(const std::string fullpath) {
   }
 }
 
+std::string DirectoryInput::getCurrentFilename() {
+	return _curFilename;
+}
 bool DirectoryInput::nextImage() {
     if (_itFilename == _filenameList.end()) {
         return false;
     }
     std::string path = _directory.fullpath(*_itFilename);
-
+	_curFilename = *_itFilename;
     _img = cv::imread(path.c_str());
 
 	tm date = DirectoryInput::readExifCreatedDate(path);

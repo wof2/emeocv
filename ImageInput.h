@@ -37,13 +37,14 @@ public:
     DirectoryInput(const Directory & directory);
 
     virtual bool nextImage();
-
+	std::string getCurrentFilename();
 private:
     Directory _directory;
     std::list<std::string>::const_iterator _itFilename;
     std::list<std::string> _filenameList;
 	tm readExifCreatedDate(const std::string fullpath);
 	tm readFilenameDate(const std::string filename);
+	std::string _curFilename;
 };
 
 class CameraInput: public ImageInput {

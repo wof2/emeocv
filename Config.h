@@ -12,19 +12,26 @@ class Config
 {
 public:
     Config();
+    int getCounterMarkerHHI() const
+    {
+	return _counterMarkerHHI;
+    }
+    int getCounterMarkerHLOW() const
+    {
+	return _counterMarkerHLOW;
+    }
+    int getCounterMarkerVLOW() const
+    {
+	return _counterMarkerVLOW;
+    }
+    int getCounterMarkerSLOW() const
+    {
+	return _counterMarkerSLOW;
+    }
     void saveConfig();
     void loadConfig();
 
-    float getDigitMaxHeight() const
-    {
-	return _digitMaxHeight;
-    }
-
-    float getDigitMinHeight() const
-    {
-	return _digitMinHeight;
-    }
-
+   
     int getDigitYAlignment() const
     {
 	return _digitYAlignment;
@@ -54,22 +61,23 @@ public:
     {
 	return _cannyThreshold2;
     }
-	int getDigitCount() const
+    int getDigitCount() const
     {
-		return _digitCount;
+	return _digitCount;
     }
 
 private:
     int _rotationDegrees;
     float _ocrMaxDist;
-    float _digitMinHeight;
-    float _digitMaxHeight;
     int _digitYAlignment;
     int _cannyThreshold1;
     int _cannyThreshold2;
+    int _counterMarkerHLOW;
+    int _counterMarkerHHI;
+    int _counterMarkerSLOW;
+    int _counterMarkerVLOW;
     std::string _trainingDataFilename;
     const int _digitCount = 7;
-  
 };
 
 #endif /* CONFIG_H_ */

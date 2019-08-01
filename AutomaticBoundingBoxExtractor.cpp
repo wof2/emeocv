@@ -6,7 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "SortUtils.h"
 
-AutomaticBoundingBoxExtractor::AutomaticBoundingBoxExtractor(const Config & config) : AbstractDigitBoundingBoxesExtractor(config), _debugContours(true) {
+AutomaticBoundingBoxExtractor::AutomaticBoundingBoxExtractor(const Config & config) : AbstractDigitBoundingBoxesExtractor(config), _debugContours(false) {
 	
 }
 
@@ -61,7 +61,7 @@ void AutomaticBoundingBoxExtractor::filterContours(cv::Mat& counterArea, std::ve
     // filter contours by bounding rect size
     log4cpp::Category& rlog = log4cpp::Category::getRoot();
 
-     rlog << log4cpp::Priority::INFO << "number of contours before filtering: " << contours.size();
+     rlog << log4cpp::Priority::DEBUG << "number of contours before filtering: " << contours.size();
      std::vector<cv::Rect> tmpBoxes;
 	
     
@@ -74,9 +74,9 @@ void AutomaticBoundingBoxExtractor::filterContours(cv::Mat& counterArea, std::ve
 	
 	for (size_t i = 0; i < tmpBoxes.size(); i++) {			
 		cv::Rect bounds = tmpBoxes[i];		
-		 rlog << log4cpp::Priority::INFO << "bounding : " << bounds;                    
-        if (bounds.height > 0.25f *counterArea.rows && bounds.height < 0.9f *counterArea.rows
-                && bounds.width > 5 && bounds.width < bounds.height) {	
+	//	 rlog << log4cpp::Priority::DEBUG << "bounding : " << bounds;                    
+        if (bounds.height > 0.25f *counterArea.rows && bounds.height < 0.99f *counterArea.rows
+                && bounds.width > 6 && bounds.width < bounds.height) {	
 			if(i>0) {		
 					boundingBoxes.push_back(bounds); 				
 			} else {			
@@ -108,28 +108,52 @@ void AutomaticBoundingBoxExtractor::findAlignedBoxes(std::vector<cv::Rect>::cons
     cv::Rect start = *it;
     ++it;
     result.push_back(start);
-	cv::Rect lastRect;
+	cv::Rect lastRect = start;
+	std::vector<float> xdiffs;
+	float avgxdiff = 0;
 	// area diff
     for (; it != end; ++it) {		
 		if (abs(start.y - it->y) < _config.getDigitYAlignment() && (1.0f*abs(start.height - it->height) / start.height) < 0.5f) {
-			if(lastRect.area() == 0) { // no boxes so far
-				result.push_back(*it);
-				lastRect = *it;
-			}else{
-				float xdiff = abs(it->x - (lastRect.x + lastRect.width)); 
-				if(xdiff > (it->width + lastRect.width)*0.3f ) { // can't be packed too close together
-					float areaDiffPercentage = abs(lastRect.area() - it->area()) / it->area();
-					if(areaDiffPercentage < 0.3f){
-						result.push_back(*it);
-						lastRect = *it;
-					}
-					
+			float xdiff = abs(it->x - (lastRect.x + lastRect.width)); 
+				float areaDiffPercentage = 1.0f*abs(lastRect.area() - it->area()) / (1.0f*it->area());
+				if(areaDiffPercentage < 2.0f){
+					result.push_back(*it);
+					lastRect = *it;
+					xdiffs.push_back(xdiff);
+					avgxdiff+=xdiff;
 				}
-			}
+		}
+    }
+		
+	 std::vector<cv::Rect>::const_iterator it2 = begin;
+	// result is 1 element bigger than xdiffs
+	if(result.size() <2 || xdiffs.size()<1 ) return;
+	avgxdiff /= (xdiffs.size());
+	
+	// remove bounding boxes that are packed to close together.
+	it2 = result.begin();
+	it2++; // start from the secound rect
+	
+	int j = 0;
+
+	while(it2 != result.end()) {
+		float diff = xdiffs.at(j);		
+		if(diff < avgxdiff * 0.17f || diff > avgxdiff * 2.4f) {
+			 cv::Rect prev = cv::Rect2f(*it2);	
+			//std::cout<<"Kasuje"<<prev<<" \n";
+			 it2 = result.erase(it2);
+			 if(it2 != result.end()) { // there are more elements
+				 // update next element xDiff info				
+				 float newXDiff = abs(it2->x - (prev.x + prev.width)); 	
+				 xdiffs.at(j+1) = newXDiff;
+			 }				 
 			
 		}
+		else ++it2;
+		++j;
 		
-    }
+	}
+	
 }
 
 

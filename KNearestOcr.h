@@ -24,6 +24,7 @@ public:
     int learn(const std::vector<cv::Mat> & images);
     bool hasTrainingData();
     void saveTrainingData();
+	std::string getStatitics();
     bool loadTrainingData();
 
     char recognize(const cv::Mat & img);
