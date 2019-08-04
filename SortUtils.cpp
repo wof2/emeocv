@@ -8,6 +8,17 @@ SortUtils::~SortUtils()
 {
 }
 
+float SortUtils::getMedianFromSortedVector(std::vector<float> v) {
+	float median;
+	int s= v.size(); 
+	if(v.size() % 2 == 0 ) { 		
+		median = v[s/2] + v[(s/2) - 1];
+		median /= 2; 
+	}else {
+		median =v[floor(s/2)];
+	}
+	return median;
+}
 
 float  SortUtils::getLinePointAvgY(cv::Vec2f line) {
         float rho = line[0];

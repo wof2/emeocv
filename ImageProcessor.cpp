@@ -22,7 +22,7 @@
 #include "SortUtils.h"
 
 ImageProcessor::ImageProcessor(const Config & config) :
-        _config(config), _debugWindow(true), _debugSkew(false), _debugDigits(true), _debugEdges(false) {
+        _config(config), _debugWindow(false), _debugSkew(false), _debugDigits(true), _debugEdges(false) {
 }
 
 
@@ -91,10 +91,10 @@ void ImageProcessor::process() {
 	//_boundingBoxExtractor = new EvenSpacingBoundingBoxExtractor(_config);
 	_boundingBoxExtractor = new AutomaticBoundingBoxExtractor(_config);
     log4cpp::Category& rlog = log4cpp::Category::getRoot();        
-        
-    if(_img.rows > _maxImageHeight) {
+	
+    if(_img.rows > _config.getMaxImageHeight()) {
         float ratio = 1.0f * _img.cols / _img.rows;
-        cv::Size size = cv::Size(floor(_maxImageHeight* ratio),  _maxImageHeight);
+        cv::Size size = cv::Size(floor(_config.getMaxImageHeight()* ratio),  _config.getMaxImageHeight());
         rlog << log4cpp::Priority::INFO << "Resizing image to : " << size.width << ", " << size.height;
         cv::Mat mat =_img.clone();
     //    delete *_img;
@@ -253,8 +253,6 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 	//	cv::imshow("blur", blur);
 	cvtColor(blur, hsv, cv::COLOR_BGR2HSV);
 	cv::inRange(hsv, lower, upper, thrs);
-	//cv::Mat thrs_channels[3];
-	//cv::split( thrs, thrs_channels );
 //imshow("before closing", thrs);
 
 	// remove noise by MORPH_CLOSE

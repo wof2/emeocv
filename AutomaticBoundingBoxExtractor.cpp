@@ -124,11 +124,16 @@ void AutomaticBoundingBoxExtractor::findAlignedBoxes(std::vector<cv::Rect>::cons
 				}
 		}
     }
+
 		
-	 std::vector<cv::Rect>::const_iterator it2 = begin;
+	std::vector<cv::Rect>::const_iterator it2 = begin;
 	// result is 1 element bigger than xdiffs
 	if(result.size() <2 || xdiffs.size()<1 ) return;
-	avgxdiff /= (xdiffs.size());
+	std::vector<float> xdiffsSorted= xdiffs;
+	
+	std::sort(xdiffsSorted.begin(), xdiffsSorted.end(), sortFloats());  
+	float median = SortUtils::getMedianFromSortedVector(xdiffsSorted);
+   
 	
 	// remove bounding boxes that are packed to close together.
 	it2 = result.begin();
@@ -138,14 +143,14 @@ void AutomaticBoundingBoxExtractor::findAlignedBoxes(std::vector<cv::Rect>::cons
 
 	while(it2 != result.end()) {
 		float diff = xdiffs.at(j);		
-		if(diff < avgxdiff * 0.17f || diff > avgxdiff * 2.4f) {
-			 cv::Rect prev = cv::Rect2f(*it2);	
+		if(1 && (diff < median * 0.7f || diff > median * 1.3f)) {
 			//std::cout<<"Kasuje"<<prev<<" \n";
 			 it2 = result.erase(it2);
 			 if(it2 != result.end()) { // there are more elements
 				 // update next element xDiff info				
-				 float newXDiff = abs(it2->x - (prev.x + prev.width)); 	
-				 xdiffs.at(j+1) = newXDiff;
+				 cv::Rect prev = result[j];	
+				 float newXDiff = abs(it2->x - (prev.x + prev.width));
+ 				 xdiffs.at(j+1) = newXDiff;
 			 }				 
 			
 		}

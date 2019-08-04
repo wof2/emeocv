@@ -31,7 +31,6 @@ public:
     void saveConfig();
     void loadConfig();
 
-   
     int getDigitYAlignment() const
     {
 	return _digitYAlignment;
@@ -65,6 +64,10 @@ public:
     {
 	return _digitCount;
     }
+	int getMaxImageHeight() const
+    {
+	return _maxImageHeight;
+    }
 
 private:
     int _rotationDegrees;
@@ -77,6 +80,9 @@ private:
     int _counterMarkerSLOW;
     int _counterMarkerVLOW;
     std::string _trainingDataFilename;
+    int _maxImageHeight;
+  
+
     const int _digitCount = 7;
 };
 

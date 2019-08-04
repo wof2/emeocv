@@ -59,8 +59,7 @@ private:
     cv::Rect2d _digitsRegion;
     std::vector<cv::Mat> _digits;
     Config _config;
-    const int _maxImageHeight = 600;
-
+  
     bool _debugWindow;
     bool _debugSkew;
     bool _debugEdges;

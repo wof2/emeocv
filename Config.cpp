@@ -9,7 +9,7 @@
 
 Config::Config() :
         _rotationDegrees(-90), _ocrMaxDist(5e5), _digitYAlignment(10), _cannyThreshold1(160), _cannyThreshold2(
-                255), _trainingDataFilename("trainctr.yml"), _counterMarkerHLOW(30), _counterMarkerHHI(85), _counterMarkerSLOW(35), _counterMarkerVLOW(80) {
+                255), _trainingDataFilename("trainctr.yml"), _counterMarkerHLOW(30), _counterMarkerHHI(85), _counterMarkerSLOW(35), _counterMarkerVLOW(80), _maxImageHeight(600) {
 }
 
 void Config::saveConfig() {
@@ -24,6 +24,7 @@ void Config::saveConfig() {
     fs << "counterMarkerHHI" << _counterMarkerHHI;
     fs << "counterMarkerSLOW" << _counterMarkerSLOW;
     fs << "counterMarkerVLOW" << _counterMarkerVLOW;
+    fs << "maxImageHeight" << _maxImageHeight;
     fs.release();
 }
 
@@ -40,6 +41,7 @@ void Config::loadConfig() {
         fs["counterMarkerHHI"] >> _counterMarkerHHI;
         fs["counterMarkerSLOW"] >> _counterMarkerSLOW;
         fs["counterMarkerVLOW"] >> _counterMarkerVLOW;
+        fs["maxImageHeight"] >> _maxImageHeight;
         fs.release();
     } else {
         // no config file - create an initial one with default values

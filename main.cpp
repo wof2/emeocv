@@ -284,8 +284,6 @@ static void configureLogging(const std::string & priority = "INFO", bool toConso
 
 
 int main(int argc, char **argv) {
-	
-	
     int opt;
     ImageInput* pImageInput = 0;
     int inputCount = 0;
