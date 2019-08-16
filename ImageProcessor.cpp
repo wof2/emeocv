@@ -134,14 +134,17 @@ void ImageProcessor::process() {
  * Rotate image.
  */
 void ImageProcessor::rotate(double rotationDegrees) {
+	if(abs(rotationDegrees) < std::numeric_limits<double_t>::epsilon()) {
+		return;
+	}
     cv::Mat M = cv::getRotationMatrix2D(cv::Point(_imgGray.cols / 2, _imgGray.rows / 2), rotationDegrees, 1);
     cv::Mat img_rotated;
     cv::warpAffine(_imgGray, img_rotated, M, _imgGray.size());
     _imgGray = img_rotated;
-    if (_debugWindow) {
+    // if (_debugWindow) {
         cv::warpAffine(_img, img_rotated, M, _img.size());
         _img = img_rotated;
-    }
+    //}
 }
 
 /**

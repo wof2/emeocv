@@ -60,24 +60,27 @@ static void testOcr(ImageInput* pImageInput) {
     while (pImageInput->nextImage()) {	
         proc.setInput(pImageInput->getImage());
         proc.process();
-
-        std::string result = ocr.recognize(proc.getOutput());
-        std::cout << result;
+		if (proc.getOutput().size() != config.getDigitCount()) {
+			plausi.registerNotRecognized();
+		}else{
+			std::string result = ocr.recognize(proc.getOutput());
+			std::cout << result;
+					
+			if (plausi.check(result, pImageInput->getTime())) {
 				
-        if (plausi.check(result, pImageInput->getTime())) {
-			
-            std::cout << "  " << std::fixed << std::setprecision(1) << plausi.getCheckedValue() << std::endl;
-        } else {
-			
-			
-            std::cout << "  -------"; 
-			DirectoryInput* dirInput = dynamic_cast<DirectoryInput*>(pImageInput);
-			if (dirInput != nullptr) {
-				 std::cout << " " <<  dirInput->getCurrentFilename();;
+				std::cout << "  " << std::fixed << std::setprecision(1) << plausi.getCheckedValue() << std::endl;
+			} else {
+				
+				
+				std::cout << "  -------"; 
+				DirectoryInput* dirInput = dynamic_cast<DirectoryInput*>(pImageInput);
+				if (dirInput != nullptr) {
+					 std::cout << " " <<  dirInput->getCurrentFilename();;
+				}
+				std::cout << std::endl;
+				
 			}
-			std::cout << std::endl;
-			
-        }
+		}
         int key = cv::waitKey(delay) & 255;
 
         if (key == 'q') {
