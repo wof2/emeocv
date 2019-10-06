@@ -298,7 +298,7 @@ int main(int argc, char **argv) {
     while ((opt = getopt(argc, argv, "i:c:ltaws:o:v:hp")) != -1) {
         switch (opt) {
             case 'i':
-                pImageInput = new DirectoryInput(Directory(optarg, ".jpg"));
+                pImageInput = new DirectoryInput(Directory(optarg, ".png"));
                 inputCount++;
                 break;
             case 'c':

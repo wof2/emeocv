@@ -266,7 +266,7 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 
 	std::vector<std::vector<cv::Point> > contours, filteredContours;
     std::vector<cv::Rect> bb;
-
+	std::vector<cv::Rect> bb2;
     #if CV_MAJOR_VERSION == 2
         cv::findContours(thrs, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
     #elif CV_MAJOR_VERSION == 3 | 4
@@ -277,7 +277,7 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 	 
     for (size_t i = 0; i < contours.size(); i++) {
 		cv::approxPolyDP(contours[i],approx , 0.1f*cv::arcLength(contours[i], true), true);
-		if(approx.total()==4) {		
+		//if(approx.total()==4) {		
 			cv::Rect bounds = cv::boundingRect(approx);
 			if(bounds.area() > _img.rows * _img.cols * 0.005f) { // at least 0,5% of the image
  				bb.push_back(bounds);
@@ -285,7 +285,7 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 				cv::rectangle(img, cv::Point2f(bounds.x, bounds.y), cv::Point2f(bounds.x + bounds.width, bounds.y + bounds.height) , cv::Scalar(255,0,0), 2);
 		
 			}				
-		}
+	//}
 	}
 	
 	if(_debugEdges) {
@@ -296,15 +296,21 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 	}
 	
 	if(bb.size() != 2 ) {
-		rlog << log4cpp::Priority::ERROR << " Marker detection failed. Found " << contours.size() << " contours instead of 2";
+		rlog << log4cpp::Priority::ERROR << " Marker detection failed. Found " << bb.size() << " contours instead of 2";
 		cv::imshow("Image error", img);
 		cv::imshow("Image error - thrs", thrs);
 		cv::waitKey(0);
 //        exit(-1);
 		throw new cv::Exception();
 	}
-	std::sort(bb.begin(), bb.end(), sortRectByX());  
-	return cv::Rect2f(bb[0].x + bb[0].width,  bb[0].y,  bb[1].x - (bb[0].x + bb[0].width), bb[0].height > bb[1].height ? bb[0].height : bb[1].height );
+	std::sort(bb.rbegin(), bb.rend(), sortRectByArea());   // sort descending
+	
+	// take the biggest two rectangles
+	bb2.push_back(bb[0]);	
+	bb2.push_back(bb[1]);
+	
+	std::sort(bb2.begin(), bb2.end(), sortRectByX());  
+	return cv::Rect2f(bb2[0].x + bb2[0].width,  bb2[0].y,  bb2[1].x - (bb2[0].x + bb2[0].width), bb2[0].height > bb2[1].height ? bb2[0].height : bb2[1].height );
 }
 
 cv::Mat ImageProcessor::replaceRedWithBlack(cv::Mat & img) {

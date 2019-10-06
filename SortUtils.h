@@ -9,6 +9,12 @@ public:
 	float static getLinePointAvgY(cv::Vec2f line);
 	float static getMedianFromSortedVector(std::vector<float> v);
 };
+class sortRectByArea {
+public:
+    bool operator()(cv::Rect const & a, cv::Rect const & b) const {
+        return a.area() < b.area();
+    }
+};
 /**
  * Functor to help sorting rectangles by their x-position.
  */
