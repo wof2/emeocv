@@ -59,7 +59,19 @@ static void testOcr(ImageInput* pImageInput) {
 
     while (pImageInput->nextImage()) {	
         proc.setInput(pImageInput->getImage());
-        proc.process();
+		try{
+			proc.process();
+		
+		}
+		catch (const cv::Exception& e) {
+			std::cout << "Exception while processing image. Skipping to next  " << std::fixed;
+			int key = cv::waitKey(delay) & 255;
+
+			if (key == 'q') {
+				std::cout << "Quit\n";
+				break;
+			}
+		}
 		if (proc.getOutput().size() != config.getDigitCount()) {
 			plausi.registerNotRecognized();
 		}else{

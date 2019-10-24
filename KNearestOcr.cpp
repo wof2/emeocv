@@ -155,6 +155,7 @@ bool KNearestOcr::loadTrainingData() {
  */
 char KNearestOcr::recognize(const cv::Mat& img) {
     log4cpp::Category& rlog = log4cpp::Category::getRoot();
+	
     char cres = '?';
     try {
 #if CV_MAJOR_VERSION == 2

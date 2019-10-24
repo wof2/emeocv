@@ -91,7 +91,6 @@ void ImageProcessor::process() {
 	//_boundingBoxExtractor = new EvenSpacingBoundingBoxExtractor(_config);
 	_boundingBoxExtractor = new AutomaticBoundingBoxExtractor(_config);
     log4cpp::Category& rlog = log4cpp::Category::getRoot();        
-	
     if(_img.rows > _config.getMaxImageHeight()) {
         float ratio = 1.0f * _img.cols / _img.rows;
         cv::Size size = cv::Size(floor(_config.getMaxImageHeight()* ratio),  _config.getMaxImageHeight());
@@ -277,7 +276,7 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 	 
     for (size_t i = 0; i < contours.size(); i++) {
 		cv::approxPolyDP(contours[i],approx , 0.1f*cv::arcLength(contours[i], true), true);
-		//if(approx.total()==4) {		
+		if(approx.total()==4) {		
 			cv::Rect bounds = cv::boundingRect(approx);
 			if(bounds.area() > _img.rows * _img.cols * 0.005f) { // at least 0,5% of the image
  				bb.push_back(bounds);
@@ -285,7 +284,7 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 				cv::rectangle(img, cv::Point2f(bounds.x, bounds.y), cv::Point2f(bounds.x + bounds.width, bounds.y + bounds.height) , cv::Scalar(255,0,0), 2);
 		
 			}				
-	//}
+		}
 	}
 	
 	if(_debugEdges) {
@@ -300,7 +299,7 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 		cv::imshow("Image error", img);
 		cv::imshow("Image error - thrs", thrs);
 		cv::waitKey(0);
-//        exit(-1);
+		
 		throw new cv::Exception();
 	}
 	std::sort(bb.rbegin(), bb.rend(), sortRectByArea());   // sort descending
@@ -339,8 +338,13 @@ cv::Mat ImageProcessor::replaceRedWithBlack(cv::Mat & img) {
 void ImageProcessor::findCounterDigits() {
     log4cpp::Category& rlog = log4cpp::Category::getRoot();
 //	_img = replaceRedWithBlack(_img);
-    _digitsRegion = findCounterArea(_img);	
+	try {
+		_digitsRegion = findCounterArea(_img);	
 	
+	}
+	catch (const cv::Exception& e) {
+		throw e;
+	}
 	//createGray();
 	cv::Mat smallGray = _imgGray(_digitsRegion);
 	
