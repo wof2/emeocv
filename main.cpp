@@ -58,20 +58,9 @@ static void testOcr(ImageInput* pImageInput) {
     std::cout << "<q> to quit.\n";
 
     while (pImageInput->nextImage()) {	
-        proc.setInput(pImageInput->getImage());
-		try{
-			proc.process();
-		
-		}
-		catch (const cv::Exception& e) {
-			std::cout << "Exception while processing image. Skipping to next  " << std::fixed;
-			int key = cv::waitKey(delay) & 255;
-
-			if (key == 'q') {
-				std::cout << "Quit\n";
-				break;
-			}
-		}
+        proc.setInput(pImageInput->getImage());		
+		proc.process();
+	
 		if (proc.getOutput().size() != config.getDigitCount()) {
 			plausi.registerNotRecognized();
 		}else{
@@ -174,7 +163,13 @@ static void adjustCamera(ImageInput* pImageInput) {
     while (pImageInput->nextImage()) {
         proc.setInput(pImageInput->getImage());
         if (processImage) {
-            proc.process();
+			try{
+				proc.process();			
+			}
+			catch (const cv::Exception& e) {
+				std::cout << "Exception while processing image. Skipping to next  " << std::fixed;				
+			}
+            
         } else {
             proc.showImage();
         }
