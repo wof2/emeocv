@@ -123,9 +123,12 @@ bool DirectoryInput::nextImage() {
 
 CameraInput::CameraInput(int device) {
     _capture.open(device);
+	_capture.set(cv::CAP_PROP_FRAME_WIDTH, 800);
+	_capture.set(cv::CAP_PROP_FRAME_HEIGHT, 600);
+	_capture.set(cv::CAP_PROP_FPS, 5);
 	
-	_capture.set(cv::CAP_PROP_AUTO_EXPOSURE, 0.25);
-	_capture.set(cv::CAP_PROP_EXPOSURE, 0.1);
+	//_capture.set(cv::CAP_PROP_AUTO_EXPOSURE, 0.25);
+	//_capture.set(cv::CAP_PROP_EXPOSURE, 0.1);
 	
 }
 bool CameraInput::nextImage() {
