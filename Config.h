@@ -12,6 +12,7 @@ class Config
 {
 public:
     Config();
+	
     int getCounterMarkerHHI() const
     {
 	return _counterMarkerHHI;
@@ -83,7 +84,7 @@ private:
     int _maxImageHeight;
   
 
-    const int _digitCount = 7;
+    int _digitCount = 7;
 };
 
 #endif /* CONFIG_H_ */

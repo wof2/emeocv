@@ -25,6 +25,10 @@ ImageProcessor::ImageProcessor(const Config & config) :
         _config(config), _debugWindow(false), _debugSkew(false), _debugDigits(true), _debugEdges(false) {
 }
 
+void ImageProcessor::reloadConfig(const Config& config)  {
+	 _config=config;
+}
+
 
 ImageProcessor::~ImageProcessor() {
 	if(_boundingBoxExtractor != NULL) {
@@ -94,13 +98,14 @@ void ImageProcessor::process() {
     if(_img.rows > _config.getMaxImageHeight()) {
         float ratio = 1.0f * _img.cols / _img.rows;
         cv::Size size = cv::Size(floor(_config.getMaxImageHeight()* ratio),  _config.getMaxImageHeight());
-        rlog << log4cpp::Priority::INFO << "Resizing image to : " << size.width << ", " << size.height;
+        rlog << log4cpp::Priority::WARN << "Resizing image to : " << size.width << ", " << size.height;
         cv::Mat mat =_img.clone();
     //    delete *_img;
         _img = resize(mat, size);
 
     }
 	createGray();
+
 	int morph_size = 1;
 	cv::Mat kernel = cv::getStructuringElement( 2, cv::Size( 2*morph_size + 1, 2*morph_size+1 ), cv::Point( morph_size, morph_size ) );	
 	cv::morphologyEx(_imgGray, _imgGray, cv::MORPH_OPEN, kernel);	
@@ -341,13 +346,13 @@ void ImageProcessor::findCounterDigits() {
 	try {
 		_digitsRegion = findCounterArea(_img);	
 	
-	}
+	} 
 	catch (const cv::Exception& e) {
 		throw e;
 	}
 	//createGray();
 	cv::Mat smallGray = _imgGray(_digitsRegion);
-	
+
 	cv::Mat edges = cannyEdges(smallGray, _config.getCannyThreshold1(), _config.getCannyThreshold2());
 	
 	//cv::Mat edgesSmall = edges;

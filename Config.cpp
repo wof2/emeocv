@@ -12,6 +12,7 @@ Config::Config() :
                 255), _trainingDataFilename("trainctr.yml"), _counterMarkerHLOW(30), _counterMarkerHHI(85), _counterMarkerSLOW(35), _counterMarkerVLOW(80), _maxImageHeight(600) {
 }
 
+
 void Config::saveConfig() {
     cv::FileStorage fs("config.yml", cv::FileStorage::WRITE);
     fs << "rotationDegrees" << _rotationDegrees;

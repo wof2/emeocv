@@ -161,13 +161,16 @@ static void adjustCamera(ImageInput* pImageInput) {
     bool processImage = true;
     int key = 0;
     while (pImageInput->nextImage()) {
+		std::cout << "Reloading config" << std::fixed << std::endl;
+		config.loadConfig();
+		proc.reloadConfig(config);
         proc.setInput(pImageInput->getImage());
         if (processImage) {
 			try{
 				proc.process();			
 			}
 			catch (const cv::Exception& e) {
-				std::cout << "Exception while processing image. Skipping to next  " << std::fixed;				
+				std::cout << "Exception while processing image. Skipping to next  " << std::fixed<< std::endl;				
 			}
             
         } else {
@@ -189,7 +192,7 @@ static void adjustCamera(ImageInput* pImageInput) {
     if (key != 'q') {
         std::cout << "Saving config\n";
         config.saveConfig();
-    }
+    };
 }
 
 static void capture(ImageInput* pImageInput) {
@@ -226,7 +229,14 @@ static void writeData(ImageInput* pImageInput) {
 
     while (pImageInput->nextImage()) {
         proc.setInput(pImageInput->getImage());
-        proc.process();
+		try{
+			proc.process();			
+		}
+		catch (const cv::Exception& e) {
+			std::cout << "Exception while processing image. Skipping to next  " << std::fixed<< std::endl;				
+			continue;
+		}
+		
 		if (proc.getOutput().size() != config.getDigitCount()) {
 			plausi.registerNotRecognized();
 		}else{

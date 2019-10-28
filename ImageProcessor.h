@@ -21,6 +21,7 @@ public:
     ImageProcessor(const Config& config);
 	~ImageProcessor();
 
+	void reloadConfig(const Config& config);
     void setOrientation(int rotationDegrees);
     void setInput(cv::Mat& img);
     void process();
