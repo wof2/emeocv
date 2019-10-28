@@ -123,8 +123,11 @@ bool DirectoryInput::nextImage() {
 
 CameraInput::CameraInput(int device) {
     _capture.open(device);
+	
+	_capture.set(cv::CAP_PROP_AUTO_EXPOSURE, 0.25);
+	_capture.set(cv::CAP_PROP_EXPOSURE, 0.1);
+	
 }
-
 bool CameraInput::nextImage() {
     time(&_time);
     // read image from camera
