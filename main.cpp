@@ -271,10 +271,11 @@ static void writeData(ImageInput* pImageInput) {
 static void usage(const char* progname) {
     std::cout << "Program to read and recognize the counter of an electricity meter with OpenCV.\n";
     std::cout << "Version: " << VERSION << std::endl;
-    std::cout << "Usage: " << progname << " [-i <dir>|-c <cam>] [-l|-t|-a|-w|-o <dir>] [-s <delay>] [-v <level>\n";
+    std::cout << "Usage: " << progname << " [-i <dir>|-c <cam>|k] [-l|-t|-a|-w|-o <dir>] [-s <delay>] [-v <level>\n";
     std::cout << "\nImage input:\n";
     std::cout << "  -i <image directory> : read image files (png) from directory.\n";
     std::cout << "  -c <camera number> : read images from camera.\n";
+    std::cout << "  -k : read images from camera. Use CLI command provided in config.yml\n";
     std::cout << "\nOperation:\n";
     std::cout << "  -a : adjust camera.\n";
     std::cout << "  -o <directory> : capture images into directory.\n";
@@ -311,8 +312,8 @@ int main(int argc, char **argv) {
     std::string logLevel = "ERROR";
     char cmd = 0;
     int cmdCount = 0;
-
-    while ((opt = getopt(argc, argv, "i:c:ltaws:o:v:hp")) != -1) {
+	Config config;
+    while ((opt = getopt(argc, argv, "i:kc:ltaws:o:v:hp")) != -1) {
         switch (opt) {
             case 'i':
                 pImageInput = new DirectoryInput(Directory(optarg, ".png"));
@@ -322,7 +323,12 @@ int main(int argc, char **argv) {
                 pImageInput = new CameraInput(atoi(optarg));
                 inputCount++;
                 break;
-			 case 'p': 
+			case 'k':				
+				config.loadConfig();   
+                pImageInput = new CLIImageInput(config.getCliCaptureCommand(), config.getCliCaptureTemporaryPath());
+                inputCount++;
+                break;					
+			case 'p': 
 				printStatistics();
 				exit(EXIT_SUCCESS);
 				break;
@@ -365,7 +371,7 @@ int main(int argc, char **argv) {
 
     configureLogging(logLevel, cmd == 'a');
 
-    switch (cmd) {
+    switch (cmd) {		
         case 'o':
             pImageInput->setOutputDir(outputDir);
             capture(pImageInput);

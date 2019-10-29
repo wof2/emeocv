@@ -12,7 +12,7 @@ class Config
 {
 public:
     Config();
-	
+
     int getCounterMarkerHHI() const
     {
 	return _counterMarkerHHI;
@@ -41,6 +41,9 @@ public:
     {
 	return _trainingDataFilename;
     }
+	
+	std::string getCliCaptureCommand() const {return _cliCaptureCommand;}
+	std::string getCliCaptureTemporaryPath() const {return _cliCaptureTemporaryPath;}
 
     float getOcrMaxDist() const
     {
@@ -65,10 +68,11 @@ public:
     {
 	return _digitCount;
     }
-	int getMaxImageHeight() const
+    int getMaxImageHeight() const
     {
 	return _maxImageHeight;
     }
+	
 
 private:
     int _rotationDegrees;
@@ -82,8 +86,10 @@ private:
     int _counterMarkerVLOW;
     std::string _trainingDataFilename;
     int _maxImageHeight;
-  
+    std::string _cliCaptureCommand;
+    std::string _cliCaptureTemporaryPath;
 
+   
     int _digitCount = 7;
 };
 

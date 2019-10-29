@@ -9,7 +9,7 @@
 
 Config::Config() :
         _rotationDegrees(-90), _ocrMaxDist(5e5), _digitYAlignment(10), _cannyThreshold1(160), _cannyThreshold2(
-                255), _trainingDataFilename("trainctr.yml"), _counterMarkerHLOW(30), _counterMarkerHHI(85), _counterMarkerSLOW(35), _counterMarkerVLOW(80), _maxImageHeight(600) {
+                255), _trainingDataFilename("trainctr.yml"), _cliCaptureTemporaryPath("/dev/shm/image_emeocv.png"), _cliCaptureCommand("raspistill -w 800 -h 600 -n -o"), _counterMarkerHLOW(30), _counterMarkerHHI(85), _counterMarkerSLOW(35), _counterMarkerVLOW(80), _maxImageHeight(600) {
 }
 
 
@@ -20,7 +20,9 @@ void Config::saveConfig() {
     fs << "cannyThreshold2" << _cannyThreshold2;
     fs << "digitYAlignment" << _digitYAlignment;
     fs << "ocrMaxDist" << _ocrMaxDist;
-    fs << "trainingDataFilename" << _trainingDataFilename;
+    fs << "trainingDataFilename" << _trainingDataFilename;	
+    fs << "cliCaptureCommand" << _cliCaptureCommand;
+    fs << "cliCaptureTemporaryPath" << _cliCaptureTemporaryPath;
     fs << "counterMarkerHLOW" << _counterMarkerHLOW;
     fs << "counterMarkerHHI" << _counterMarkerHHI;
     fs << "counterMarkerSLOW" << _counterMarkerSLOW;
@@ -38,6 +40,8 @@ void Config::loadConfig() {
         fs["digitYAlignment"] >> _digitYAlignment;
         fs["ocrMaxDist"] >> _ocrMaxDist;
         fs["trainingDataFilename"] >> _trainingDataFilename;
+        fs["cliCaptureCommand"] >> _cliCaptureCommand;
+        fs["cliCaptureTemporaryPath"] >> _cliCaptureTemporaryPath;
         fs["counterMarkerHLOW"] >> _counterMarkerHLOW;
         fs["counterMarkerHHI"] >> _counterMarkerHHI;
         fs["counterMarkerSLOW"] >> _counterMarkerSLOW;

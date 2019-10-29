@@ -123,7 +123,7 @@ bool DirectoryInput::nextImage() {
 
 CameraInput::CameraInput(int device) {
 	
-    //_capture.open(device);
+    _capture.open(device);
 	//_capture.set(cv::CAP_PROP_FRAME_WIDTH, 800);
 	//_capture.set(cv::CAP_PROP_FRAME_HEIGHT, 600);
 	//_capture.set(cv::CAP_PROP_FPS, 5);
@@ -135,17 +135,34 @@ CameraInput::CameraInput(int device) {
 bool CameraInput::nextImage() {
     time(&_time);
     // read image from camera
- //   bool success = _capture.read(_img);
-	std::string path = "/dev/shm/image_emeocv.jpg";
+    bool success = _capture.read(_img);	
+    log4cpp::Category::getRoot() << log4cpp::Priority::INFO << "Image captured: " << success;
+    // save copy of image if requested
+    if (success) {
+        saveImage();
+    }
+
+    return success;
+}
+
+
+
+CLIImageInput::CLIImageInput(const std::string command, const std::string temporaryPath) {
+	this->command = command;
+	this->temporaryPath = temporaryPath;
+}
+
+bool CLIImageInput::nextImage() {
+    time(&_time);   
 	
-	std::string str = "raspistill -w 800 -h 600 -n -o "; 
-	str = str + path;
-	const char *command = str.c_str();
+	std::string str = command +" " + temporaryPath;
 	
-	std::cout << "Capture using commmand: " << command << std::endl; 
-	int status =system(command); 
+	const char *cmd = str.c_str();
 	
-	_img = cv::imread(path.c_str());
+	std::cout << "Capture using commmand: " << cmd << std::endl; 
+	int status =system(cmd); 
+	
+	_img = cv::imread(temporaryPath.c_str());
 
   
 	bool success = status ==0 && _img.data != NULL;
@@ -158,5 +175,6 @@ bool CameraInput::nextImage() {
 
     return success;
 }
+
 
 

@@ -57,4 +57,15 @@ private:
     cv::VideoCapture _capture;
 };
 
+class CLIImageInput: public ImageInput {
+public:
+    CLIImageInput(const std::string command, const std::string temporaryPath);	
+    virtual bool nextImage();
+
+private:
+    std::string command;
+    std::string temporaryPath;
+};
+
+
 #endif /* IMAGEINPUT_H_ */
