@@ -312,7 +312,7 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 		cv::imshow("Image error - thrs", thrs);
 		cv::waitKey(0);
 		
-		throw new cv::Exception();
+		throw cv::Exception();
 	}
 	std::sort(bb.rbegin(), bb.rend(), sortRectByArea());   // sort descending
 	

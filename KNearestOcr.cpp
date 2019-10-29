@@ -103,7 +103,7 @@ void KNearestOcr::saveTrainingData() {
 }
 std::string KNearestOcr::getStatitics() {
 	if(!this->hasTrainingData()) {
-		throw new std::exception();
+		throw std::exception();
 	}
 	std::string ret;
 	cv::MatIterator_<cv::Mat> it; // = src_it.begin<cv::Vec3b>();
