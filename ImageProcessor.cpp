@@ -122,7 +122,14 @@ void ImageProcessor::process() {
 
    
     // find and isolate counter digits
-    findCounterDigits();
+	try {
+		findCounterDigits();	
+	} 
+	catch (const cv::Exception& e) {		
+		std::cout << "Error in findCounterDigits: "<< e.what() << std::endl;
+		
+	}
+    
 	// Record end time
 	auto finish = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> elapsed = finish - start;

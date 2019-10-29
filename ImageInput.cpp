@@ -138,7 +138,7 @@ bool CameraInput::nextImage() {
  //   bool success = _capture.read(_img);
 	std::string path = "/dev/shm/image_emeocv.jpg";
 	
-	std::string str = "raspistill -w 800 -h 600  -o "; 
+	std::string str = "raspistill -w 800 -h 600 -n -o "; 
 	str = str + path;
 	const char *command = str.c_str();
 	
