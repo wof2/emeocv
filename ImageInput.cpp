@@ -90,7 +90,7 @@ tm DirectoryInput::readExifCreatedDate(const std::string fullpath) {
 	//std::cout<<orientation;
     exif_data_free(exifData);
 	return date;
-  }
+  } 
 }
 
 std::string DirectoryInput::getCurrentFilename() {
