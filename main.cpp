@@ -26,6 +26,7 @@
 #include <log4cpp/Priority.hh>
 
 #include "Config.h"
+#include "CSVDatabase.h"
 #include "Directory.h"
 #include "ImageProcessor.h"
 #include "KNearestOcr.h"
@@ -144,7 +145,6 @@ static void adjustCamera(ImageInput* pImageInput) {
 
     log4cpp::Category::getRoot().info("adjustCamera");
   
-    
     Config config;
     
     config.loadConfig();
@@ -215,7 +215,8 @@ static void writeData(ImageInput* pImageInput) {
 
     Plausi plausi;
 
-    RRDatabase rrd("emeter.rrd");
+    //RRDatabase rrd("emeter.rrd");
+    CSVDatabase csv("emeter.csv");
 
     struct stat st;
 
@@ -252,9 +253,9 @@ static void writeData(ImageInput* pImageInput) {
 				time_t now = plausi.getCheckedTime();
 				strftime(buff, 20, "%Y-%m-%d %H:%M:%S", localtime(&now));
 				
-				std::cout << "Saving record to RRD :"<<buff<<", value: "<<plausi.getCheckedValue()<<".\n";
+				std::cout << "Saving record to CSV :"<<buff<<", value: "<<plausi.getCheckedValue()<<".\n";
   
-                rrd.update(plausi.getCheckedTime(), plausi.getCheckedValue());
+                csv.update( pImageInput->getTime(), plausi.getCheckedValue());
             }
         }
         if (0 == stat("imgdebug", &st) && S_ISDIR(st.st_mode)) {
@@ -313,6 +314,8 @@ int main(int argc, char **argv) {
     char cmd = 0;
     int cmdCount = 0;
 	Config config;
+	
+
     while ((opt = getopt(argc, argv, "i:kc:ltaws:o:v:hp")) != -1) {
         switch (opt) {
             case 'i':
@@ -330,7 +333,7 @@ int main(int argc, char **argv) {
                 break;					
 			case 'p': 
 				printStatistics();
-				exit(EXIT_SUCCESS);
+				return(EXIT_SUCCESS);
 				break;
             case 'l':
             case 't':
@@ -354,19 +357,19 @@ int main(int argc, char **argv) {
             case 'h':
             default:
                 usage(argv[0]);
-                exit(EXIT_FAILURE);
+                return(EXIT_FAILURE);
                 break;
         }
     }
     if (inputCount != 1) {
         std::cerr << "*** You should specify exactly one camera or input directory!\n\n";
         usage(argv[0]);
-        exit(EXIT_FAILURE);
+        return(EXIT_FAILURE);
     }
     if (cmdCount != 1) {
         std::cerr << "*** You should specify exactly one operation!\n\n";
         usage(argv[0]);
-        exit(EXIT_FAILURE);
+        return(EXIT_FAILURE);
     }
 
     configureLogging(logLevel, cmd == 'a');
@@ -393,5 +396,5 @@ int main(int argc, char **argv) {
     }
 
     delete pImageInput;
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }

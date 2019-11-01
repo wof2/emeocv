@@ -15,6 +15,7 @@ OBJS = $(addprefix $(OUTDIR)/,\
   KNearestOcr.o \
   Plausi.o \
   RRDatabase.o \
+  CSVDatabase.o \
   main.o \
   )
 

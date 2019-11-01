@@ -104,8 +104,8 @@ bool DirectoryInput::nextImage() {
 	_curFilename = *_itFilename;
     _img = cv::imread(path.c_str());
 
-	tm date = DirectoryInput::readExifCreatedDate(path);
-//tm date2 = DirectoryInput::readFilenameDate(*_itFilename);
+	//tm date = DirectoryInput::readExifCreatedDate(path);
+	tm date = DirectoryInput::readFilenameDate(*_itFilename);
 	
 	
     _time = mktime(&date);
