@@ -327,12 +327,12 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 cv::Mat ImageProcessor::replaceRedWithBlack(cv::Mat & img) {
 	
     cv::Mat mask, mask2, ret,hsv, maskOut;
-	cv::Scalar minCol = cv::Scalar(150,80,100);
+	cv::Scalar minCol = cv::Scalar(150,60,50);
 	cv::Scalar maxCol = cv::Scalar(180,255,255);// hue is in range 0 - 179
     cvtColor(img, hsv, cv::COLOR_BGR2HSV);
  
     cv::inRange(hsv, minCol, maxCol, mask);
-	cv::inRange(hsv, cv::Scalar(0,80,100), cv::Scalar(10,255,255), mask2);
+	cv::inRange(hsv, cv::Scalar(0,60,50), cv::Scalar(30,255,255), mask2);
   
     cv::bitwise_not(mask, mask);
 	cv::bitwise_not(mask2, mask2);
@@ -349,7 +349,7 @@ cv::Mat ImageProcessor::replaceRedWithBlack(cv::Mat & img) {
  */
 void ImageProcessor::findCounterDigits() {
     log4cpp::Category& rlog = log4cpp::Category::getRoot();
-//	_img = replaceRedWithBlack(_img);
+	//_img = replaceRedWithBlack(_img);
 	try {
 		_digitsRegion = findCounterArea(_img);	
 	

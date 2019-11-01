@@ -90,7 +90,7 @@ private:
     std::string _cliCaptureTemporaryPath;
 
    
-    int _digitCount = 7;
+    int _digitCount;
 };
 
 #endif /* CONFIG_H_ */

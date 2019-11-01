@@ -8,7 +8,7 @@
 #include "Config.h"
 
 Config::Config() :
-        _rotationDegrees(-90), _ocrMaxDist(5e5), _digitYAlignment(10), _cannyThreshold1(160), _cannyThreshold2(
+        _rotationDegrees(0), _digitCount(7), _ocrMaxDist(2100000), _digitYAlignment(20), _cannyThreshold1(160), _cannyThreshold2(
                 255), _trainingDataFilename("trainctr.yml"), _cliCaptureTemporaryPath("/dev/shm/image_emeocv.png"), _cliCaptureCommand("raspistill -w 800 -h 600 -n -o"), _counterMarkerHLOW(30), _counterMarkerHHI(85), _counterMarkerSLOW(35), _counterMarkerVLOW(80), _maxImageHeight(600) {
 }
 
@@ -28,6 +28,7 @@ void Config::saveConfig() {
     fs << "counterMarkerSLOW" << _counterMarkerSLOW;
     fs << "counterMarkerVLOW" << _counterMarkerVLOW;
     fs << "maxImageHeight" << _maxImageHeight;
+    fs << "digitCount" << _digitCount;
     fs.release();
 }
 
@@ -47,6 +48,7 @@ void Config::loadConfig() {
         fs["counterMarkerSLOW"] >> _counterMarkerSLOW;
         fs["counterMarkerVLOW"] >> _counterMarkerVLOW;
         fs["maxImageHeight"] >> _maxImageHeight;
+        fs["digitCount"] >> _digitCount;
         fs.release();
     } else {
         // no config file - create an initial one with default values
