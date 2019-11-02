@@ -22,7 +22,7 @@
 #include "SortUtils.h"
 
 ImageProcessor::ImageProcessor(const Config & config) :
-        _config(config), _debugWindow(false), _debugSkew(false), _debugDigits(true), _debugEdges(false) {
+        _config(config), _debugWindow(false), _debugSkew(false), _debugDigits(false), _debugEdges(false) {
 }
 
 void ImageProcessor::reloadConfig(const Config& config)  {

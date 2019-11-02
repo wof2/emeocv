@@ -36,6 +36,7 @@ int CSVDatabase::update(time_t rawtime, double counter) {
     snprintf(values, 255, "%s,%ld,%.1f,%.0f,\n", buffer,(long)rawtime, counter/*kWh*/, counter * 3600000. /*Ws*/);
   
 	_handle << values;
+	_handle.flush();
     //if (res) {
    //     log4cpp::Category::getRoot() << log4cpp::Priority::ERROR << rrd_get_error();
    // }
