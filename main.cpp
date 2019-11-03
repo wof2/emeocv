@@ -255,7 +255,7 @@ static void writeData(ImageInput* pImageInput) {
 				
 				std::cout << "Saving record to CSV :"<<buff<<", value: "<<plausi.getCheckedValue()<<".\n";
   
-                csv.update( pImageInput->getTime(), plausi.getCheckedValue());
+                csv.update( plausi.getCheckedTime(), plausi.getCheckedValue());
             }
         }
         if (0 == stat("imgdebug", &st) && S_ISDIR(st.st_mode)) {
