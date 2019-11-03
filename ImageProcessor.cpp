@@ -308,9 +308,11 @@ cv::Rect ImageProcessor::findCounterArea(cv::Mat & img) {
 	
 	if(bb.size() != 2 ) {
 		rlog << log4cpp::Priority::ERROR << " Marker detection failed. Found " << bb.size() << " contours instead of 2";
-		cv::imshow("Image error", img);
-		cv::imshow("Image error - thrs", thrs);
-		cv::waitKey(0);
+		if(_debugEdges) { 
+			cv::imshow("Image error", img);
+			cv::imshow("Image error - thrs", thrs);
+			cv::waitKey(0);
+		}
 		
 		throw cv::Exception();
 	}
