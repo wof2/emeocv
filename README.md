@@ -5,7 +5,9 @@ emeocv
 Read and recognize the counter of an electricity meter with OpenCV.
 
 ![OpenCV for the electricity meter](https://github.com/wof2/emeocv/blob/master/emeocv.png)
-(https://github.com/wof2/emeocv/blob/master/emeocv2.png)
+
+![OpenCV for the electricity meter statistics](https://github.com/wof2/emeocv/blob/master/emeocv2.png)
+
 Rationale 
 =============
 I couldn't make the original program (https://github.com/skaringa/emeocv) work on my counter. Its extaction algoritm is based on digit height in pixels. My counter has multiple lines of printed text of size similar to the actual digits. I didn't like the idea of masking the unwanted text on counter. 
