@@ -31,7 +31,7 @@ Changes to original emeocv
 
 Tested with OpenCV 3.2 in 2 configurations:
 * Mobile phone as a camera: Samsung Galaxy J3 with 'Network timelapse camera' App (https://play.google.com/store/apps/details?id=com.survey7.cameraupload_full)
-* Raspbian on Raspberry PI ZERO W and ArduCam OV5647 camera 
+* Raspbian on Raspberry PI ZERO W or Raspberry Pi 4 2GB and ArduCam OV5647 camera 
 
 Prerequisites
 =============
