@@ -4,7 +4,7 @@ emeocv
 
 Read and recognize the counter of an electricity meter with OpenCV.
 
-![OpenCV for the electricity meter](http://www.kompf.de/cplus/images/emeocv_m.png)
+![OpenCV for the electricity meter](https://github.com/wof2/emeocv/blob/master/emeocv.png)
 
 Rationale 
 =============
