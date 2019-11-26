@@ -79,6 +79,8 @@ Usage
     
 Color Markers
 =====  
+![Color markers](https://github.com/wof2/emeocv/blob/master/emeocv3.png)
+
 Please remember to stick the color markers to hint th position of the counter digits. Take a look to at the picture above to get the idea of the proper placement. Blue markers worked the best for me. You can set any color (in HSV Model - H: 0-179, S: 0-255, V: 0-255) in config.yml:
     counterMarkerHLOW: 85 # Hue value minimum
     counterMarkerHHI: 110 # Hue value maximum
