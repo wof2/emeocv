@@ -21,7 +21,7 @@ The final change is the output format - I don't like RRD for its unpleasant inte
 
 Changes to original emeocv
 =============
-* Alternative digits extraction algorithm (you need 2 small color markers now)
+* Alternative digits extraction algorithm (you need 2 small color markers now). 
 * Saves results to CSV format instead of RRDtool (take a look at the results here: https://docs.google.com/spreadsheets/d/e/2PACX-1vQxh9ScohMIchp7ZPCb14Tf4HCx9nxCGeZ6HHjwop5cn3TON8AjzHbRnm3P407_hFohKvVHLNZScnzn/pubhtml)
 * Auto-install of dependecies for Debian/Ubuntu/Linux Mint/Raspbian (just run ./debian_ubuntu_dependencies.sh)
 * Rescaling of analyzed images based on configuration option (maxImageHeight) - usefull if you use mobile phone to take snapshots
@@ -72,12 +72,28 @@ Usage
     Options:
       -s <n> : Sleep n milliseconds after processing of each image (default=1000).
       -v <l> : Log level. One of DEBUG, INFO, ERROR (default).
-      
+  
+    
+Color Markers
+=====  
+Please remember to stick the color markers to hint th position of the counter digits. Take a look to at the picture above to get the idea of the proper placement. Blue markers worked the best for me. You can set any color (in HSV Model - H: 0-179, S: 0-255, V: 0-255) in config.yml:
+    counterMarkerHLOW: 85 # Hue value minimum
+    counterMarkerHHI: 110 # Hue value maximum
+    counterMarkerSLOW: 120 # Minimum saturation level
+    counterMarkerVLOW: 120 # Minimum 'Value' level
+You can take a picture of your marker, open it in any graphical editor or online tool to get the right values (remember that GIMP has different scale: H = 0-360, S = 0-100 and V = 0-100). 
+
+Google Spreadsheet
+=====  
 Clone my google Spreadsheet and paste your own CSV to get nice diagrams and a pivot table: https://docs.google.com/spreadsheets/d/1ENgyxMoM0D1TPhFQw3DrsRWjOFa0U0sc-wnM41yUeaI/edit?usp=sharing.
 
+
+Tutorial
+=====  
 There is a tutorial that explains use case and function of the original program:
 [OpenCV practice: OCR for the electricity meter](https://www.mkompf.com/cplus/emeocv.html) or
 [OpenCV Praxis: OCR für den Stromzähler](https://www.kompf.de/cplus/emeocv.html) (in german language).
+
 
 License
 =======
