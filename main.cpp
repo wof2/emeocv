@@ -37,7 +37,7 @@
 static int delay = 1000;
 
 #ifndef VERSION
-#define VERSION "0.9.7"
+#define VERSION "0.9.7 tweaked by WOF2"
 #endif
 
 static void testOcr(ImageInput* pImageInput) {
@@ -271,6 +271,7 @@ static void writeData(ImageInput* pImageInput) {
 
 static void usage(const char* progname) {
     std::cout << "Program to read and recognize the counter of an electricity meter with OpenCV.\n";
+	std::cout << "Homepage: https://github.com/wof2/emeocv\n";	
     std::cout << "Version: " << VERSION << std::endl;
     std::cout << "Usage: " << progname << " [-i <dir>|-c <cam>|k] [-l|-t|-a|-w|-o <dir>] [-s <delay>] [-v <level>\n";
     std::cout << "\nImage input:\n";
