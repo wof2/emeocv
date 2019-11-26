@@ -1,4 +1,4 @@
-This projet is a clone of
+Tweaked version of 
 emeocv
 ======
 
