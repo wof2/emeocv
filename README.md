@@ -25,6 +25,7 @@ Changes to original emeocv
 * Rescaling of analyzed images based on configuration option (maxImageHeight) - usefull if you use mobile phone to take snapshots
 * You can now use numpad keys to train the algorithm
 * You can now print training set statistics understand which digits are coved and which need more tranining (use -p option)
+* Configuration file is now reloaded after every image in adjust mode (-a). This way you can tweak your config (cannyThreshold, digitYAlignment) during runtime
 
 Tested with OpenCV 3.2 in 2 configurations:
 * Mobile phone as a camera: Samsung Galaxy J3 with 'Network timelapse camera' App (https://play.google.com/store/apps/details?id=com.survey7.cameraupload_full)
