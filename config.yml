@@ -1,10 +1,16 @@
 %YAML:1.0
 ---
 rotationDegrees: 0
-cannyThreshold1: 160
+cannyThreshold1: 120
 cannyThreshold2: 260
-digitMinHeight: 3.9999995380640030e-02
-digitMaxHeight: 6.5000005066394806e-02
 digitYAlignment: 20
-ocrMaxDist: 500000.
+ocrMaxDist: 4050000.
 trainingDataFilename: "trainctr.yml"
+cliCaptureCommand: raspistill -w 800 -h 600 -n -o
+cliCaptureTemporaryPath: "/dev/shm/image_emeocv.png"
+counterMarkerHLOW: 85
+counterMarkerHHI: 110
+counterMarkerSLOW: 120
+counterMarkerVLOW: 120
+maxImageHeight: 600
+digitCount: 7
