@@ -49,7 +49,7 @@ Build
     cd emeocv
     make #for Debug purposes    
     make RELEASE=true #for production purposes
-
+    
 Usage
 =====
     Navigate to emeocv Debug or Release subdirectory. Then run:
@@ -73,9 +73,9 @@ Usage
       -s <n> : Sleep n milliseconds after processing of each image (default=1000).
       -v <l> : Log level. One of DEBUG, INFO, ERROR (default).
       
-clone my google Spreadsheet and paste your own CSV to get nice diagrams and a pivot table: https://docs.google.com/spreadsheets/d/1ENgyxMoM0D1TPhFQw3DrsRWjOFa0U0sc-wnM41yUeaI/edit?usp=sharing.
+Clone my google Spreadsheet and paste your own CSV to get nice diagrams and a pivot table: https://docs.google.com/spreadsheets/d/1ENgyxMoM0D1TPhFQw3DrsRWjOFa0U0sc-wnM41yUeaI/edit?usp=sharing.
 
-There is a tutorial that explains use case and function of the program:
+There is a tutorial that explains use case and function of the original program:
 [OpenCV practice: OCR for the electricity meter](https://www.mkompf.com/cplus/emeocv.html) or
 [OpenCV Praxis: OCR für den Stromzähler](https://www.kompf.de/cplus/emeocv.html) (in german language).
 
