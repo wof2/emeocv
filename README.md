@@ -9,14 +9,18 @@ Read and recognize the counter of an electricity meter with OpenCV.
 Rationale 
 =============
 I couldn't make the original program (https://github.com/skaringa/emeocv) work on my counter. Its extaction algoritm is based on digit height in pixels. My counter has multiple lines of printed text of size similar to the actual digits. I didn't like the idea of masking the unwanted text on counter. 
+
 Also the original algorithm didn't work for my setup where my mobile phone moved a bit during inspection of the results after a few days of working. I've come up with a bit more sophisiticated algoritm that finds the area of interest based on two pieces of paper sticky notes. You are now more flexible with your camera mount which can be moved with no significant effect on the recognition efficiency.
+
 The third reason was the problem with configuring my Raspberry Pi camera (ArduCam OV5647) to take reliable show shutter shots. I've spent many hours trying to get the proper v4l2-ctl configuration (low framerate, high exposition, night-mode etc). Nothing worked. Finally I used Rapsbian's tool 'raspistill' that takes great shots with no tweaking needed. Now ypu can use -k option to run any command line to provide images for recognition. This way you could even use emeocv to transfer images from remote machine and analyze them locally (usefull for mobile phone setup).
+
+The final change is the output format - I don't like RRD for its unpleasant interface and bad looking diagrams. CSV is the choice  for me. It can be then managed with any program you like. I used Google spreadsheets ().
 
 
 Changes to original emeocv
 =============
-* Alternative digits extraction algorithm (you need to small color markers now)
-* Saves results to CSV format instead of RRDtool
+* Alternative digits extraction algorithm (you need 2 small color markers now)
+* Saves results to CSV format instead of RRDtool (take a look at the results here: https://docs.google.com/spreadsheets/d/e/2PACX-1vQxh9ScohMIchp7ZPCb14Tf4HCx9nxCGeZ6HHjwop5cn3TON8AjzHbRnm3P407_hFohKvVHLNZScnzn/pubhtml)
 * Auto-install of dependecies for Debian/Ubuntu/Linux Mint/Raspbian (just run ./debian_ubuntu_dependencies.sh)
 * Rescaling of analyzed images based on configuration option (maxImageHeight) - usefull if you use mobile phone to take snapshots
 * You can now use numpad keys to train the algorithm
@@ -65,6 +69,8 @@ Usage
     Options:
       -s <n> : Sleep n milliseconds after processing of each image (default=1000).
       -v <l> : Log level. One of DEBUG, INFO, ERROR (default).
+      
+clone my google Spreadsheet and paste your own CSV to get nice diagrams and a pivot table: https://docs.google.com/spreadsheets/d/1ENgyxMoM0D1TPhFQw3DrsRWjOFa0U0sc-wnM41yUeaI/edit?usp=sharing.
 
 There is a tutorial that explains use case and function of the program:
 [OpenCV practice: OCR for the electricity meter](https://www.mkompf.com/cplus/emeocv.html) or
@@ -73,6 +79,7 @@ There is a tutorial that explains use case and function of the program:
 License
 =======
 Copyright 2015,2019 Martin Kompf
+
 Changes by wof2 under same license
 
 This program is free software: you can redistribute it and/or modify
