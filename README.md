@@ -35,8 +35,10 @@ Tested with OpenCV 3.2 in 2 configurations:
 
 Prerequisites
 =============
-
 * g++, make
+* Run debian_ubuntu_dependencies.sh to get everything below... 
+
+or:
 * OpenCV 2 or 3 (Debian/Ubuntu/Raspbian: `apt-get install libopencv-dev`) - developed with OpenCV 2.3.1 and later ported to OpenCV 3.2.0
 * RRDtool (`apt-get install rrdtool librrd-dev`)
 * log4cpp (`apt-get install liblog4cpp5-dev`)
@@ -50,6 +52,7 @@ Build
     make #for Debug purposes    
     make RELEASE=true #for production purposes
     
+        
 Usage
 =====
     Navigate to emeocv Debug or Release subdirectory. Then run:
