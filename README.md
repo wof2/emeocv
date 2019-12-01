@@ -1,5 +1,5 @@
-Tweaked version of 
-emeocv
+
+Emeocv2 - tweaked version of emeocv
 ======
 
 Read and recognize the counter of an electricity meter with OpenCV.
