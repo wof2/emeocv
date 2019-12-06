@@ -6,3 +6,5 @@ nohup.out
 .cproject
 .settings/
 Debug/
+Release/
+.idea
