@@ -14,19 +14,19 @@
 #include <log4cpp/Priority.hh>
 
 #include "Plausi.h"
-	
-Plausi::Plausi(double maxPower, int window) :
-        _maxPower(maxPower), _window(window), _value(-1.), _time(0), _stats() {
+
+Plausi::Plausi(const Config & config, double maxPower, int window) :
+        _config(config), _maxPower(maxPower), _window(window), _value(-1.), _time(0), _stats() {
 }
 
 bool Plausi::check(const std::string& value, time_t time) {
     log4cpp::Category& rlog = log4cpp::Category::getRoot();
-	
+
     if (rlog.isInfoEnabled()) {
         rlog.info("Plausi check: %s of %s", value.c_str(), ctime(&time));
     }
 
-    if (value.length() != 7) {
+    if (value.length() != _config.getDigitCount()) {
         // exactly 7 digits
         rlog.info("Plausi rejected: exactly 7 digits");
 		_stats.incrNotRecognized();
@@ -38,8 +38,8 @@ bool Plausi::check(const std::string& value, time_t time) {
         _stats.incrNotRecognized();
 		return false;
     }
-	
-	
+
+
     double dval = atof(value.c_str()) / 10.;
     _queue.push_back(std::make_pair(time, dval));
   if (rlog.isDebugEnabled()) {
@@ -67,9 +67,9 @@ bool Plausi::check(const std::string& value, time_t time) {
 			if(dval - it->second > 1.0f) {
 					 rlog.error("Rejected value way smaller than the last");
 					 usleep(1000*1000*10);
-			
+
 			}
-			
+
 			//exit(1);
 			_stats.incrRecognized();
             return false;
@@ -107,7 +107,7 @@ bool Plausi::check(const std::string& value, time_t time) {
     // everything is OK -> use the candidate value
     _time = candTime;
     _value = candValue;
-	
+
 	_stats.incrRecAndPlausiChecked();
     if (rlog.isInfoEnabled()) {
         rlog.info("Plausi accepted: %.1f of %s", _value, ctime(&_time));

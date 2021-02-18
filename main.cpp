@@ -48,7 +48,7 @@ static void testOcr(ImageInput* pImageInput) {
     proc.debugWindow();
     proc.debugDigits();
 
-    Plausi plausi;
+    Plausi plausi(config);
 
     KNearestOcr ocr(config);
     if (! ocr.loadTrainingData()) {
@@ -58,29 +58,29 @@ static void testOcr(ImageInput* pImageInput) {
     std::cout << "OCR training data loaded.\n";
     std::cout << "<q> to quit.\n";
 
-    while (pImageInput->nextImage()) {	
-        proc.setInput(pImageInput->getImage());		
+    while (pImageInput->nextImage()) {
+        proc.setInput(pImageInput->getImage());
 		proc.process();
-	
+
 		if (proc.getOutput().size() != config.getDigitCount()) {
 			plausi.registerNotRecognized();
 		}else{
 			std::string result = ocr.recognize(proc.getOutput());
 			std::cout << result;
-					
+
 			if (plausi.check(result, pImageInput->getTime())) {
-				
+
 				std::cout << "  " << std::fixed << std::setprecision(1) << plausi.getCheckedValue() << std::endl;
 			} else {
-				
-				
-				std::cout << "  -------"; 
+
+
+				std::cout << "  -------";
 				DirectoryInput* dirInput = dynamic_cast<DirectoryInput*>(pImageInput);
 				if (dirInput != nullptr) {
 					 std::cout << " " <<  dirInput->getCurrentFilename();;
 				}
 				std::cout << std::endl;
-				
+
 			}
 		}
         int key = cv::waitKey(delay) & 255;
@@ -90,7 +90,7 @@ static void testOcr(ImageInput* pImageInput) {
             break;
         }
     }
-	
+
 	 std::cout << plausi.getStats() << std::endl;
 }
 
@@ -130,25 +130,25 @@ static void learnOcr(ImageInput* pImageInput) {
 static void printStatistics() {
 	Config config;
     config.loadConfig();
-   
+
     KNearestOcr ocr(config);
     if (! ocr.loadTrainingData()) {
         std::cout << "Failed to load OCR training data. Use option -l to train the program\n";
         return;
     }
-	
-	
+
+
     std::cout << "OCR stats:\n"<<ocr.getStatitics();
-   
+
 }
 static void adjustCamera(ImageInput* pImageInput) {
 
     log4cpp::Category::getRoot().info("adjustCamera");
-  
+
     Config config;
-    
+
     config.loadConfig();
-  
+
     ImageProcessor proc(config);
     proc.debugWindow();
     proc.debugDigits();
@@ -167,12 +167,12 @@ static void adjustCamera(ImageInput* pImageInput) {
         proc.setInput(pImageInput->getImage());
         if (processImage) {
 			try{
-				proc.process();			
+				proc.process();
 			}
 			catch (const cv::Exception& e) {
-				std::cout << "Exception while processing image. Skipping to next  " << std::fixed<< std::endl;				
+				std::cout << "Exception while processing image. Skipping to next  " << std::fixed<< std::endl;
 			}
-            
+
         } else {
             proc.showImage();
         }
@@ -213,7 +213,7 @@ static void writeData(ImageInput* pImageInput) {
     config.loadConfig();
     ImageProcessor proc(config);
 
-    Plausi plausi;
+    Plausi plausi(config);
 
     //RRDatabase rrd("emeter.rrd");
     CSVDatabase csv("emeter.csv");
@@ -231,13 +231,13 @@ static void writeData(ImageInput* pImageInput) {
     while (pImageInput->nextImage()) {
         proc.setInput(pImageInput->getImage());
 		try{
-			proc.process();			
+			proc.process();
 		}
 		catch (const cv::Exception& e) {
-			std::cout << "Exception while processing image. Skipping to next  " << std::fixed<< std::endl;				
+			std::cout << "Exception while processing image. Skipping to next  " << std::fixed<< std::endl;
 			continue;
 		}
-		
+
 		if (proc.getOutput().size() != config.getDigitCount()) {
 			plausi.registerNotRecognized();
 		}else{
@@ -252,9 +252,9 @@ static void writeData(ImageInput* pImageInput) {
 				char buff[20];
 				time_t now = plausi.getCheckedTime();
 				strftime(buff, 20, "%Y-%m-%d %H:%M:%S", localtime(&now));
-				
+
 				std::cout << "Saving record to CSV :"<<buff<<", value: "<<plausi.getCheckedValue()<<".\n";
-  
+
                 csv.update( plausi.getCheckedTime(), plausi.getCheckedValue());
             }
         }
@@ -263,7 +263,7 @@ static void writeData(ImageInput* pImageInput) {
             pImageInput->setOutputDir("imgdebug");
             pImageInput->saveImage();
             pImageInput->setOutputDir("");
-        }		
+        }
         usleep(delay*1000L);
     }
 	std::cout << plausi.getStats() << std::endl;
@@ -271,7 +271,7 @@ static void writeData(ImageInput* pImageInput) {
 
 static void usage(const char* progname) {
     std::cout << "Program to read and recognize the counter of an electricity meter with OpenCV.\n";
-	std::cout << "Homepage: https://github.com/wof2/emeocv\n";	
+	std::cout << "Homepage: https://github.com/wof2/emeocv\n";
     std::cout << "Version: " << VERSION << std::endl;
     std::cout << "Usage: " << progname << " [-i <dir>|-c <cam>|k] [-l|-t|-a|-w|-o <dir>] [-s <delay>] [-v <level>\n";
     std::cout << "\nImage input:\n";
@@ -315,7 +315,7 @@ int main(int argc, char **argv) {
     char cmd = 0;
     int cmdCount = 0;
 	Config config;
-	
+
 
     while ((opt = getopt(argc, argv, "i:kc:ltaws:o:v:hp")) != -1) {
         switch (opt) {
@@ -327,19 +327,19 @@ int main(int argc, char **argv) {
                 pImageInput = new CameraInput(atoi(optarg));
                 inputCount++;
                 break;
-			case 'k':				
-				config.loadConfig();   
+			case 'k':
+				config.loadConfig();
                 pImageInput = new CLIImageInput(config.getCliCaptureCommand(), config.getCliCaptureTemporaryPath());
                 inputCount++;
-                break;					
-			case 'p': 
+                break;
+			case 'p':
 				printStatistics();
 				return(EXIT_SUCCESS);
 				break;
             case 'l':
             case 't':
             case 'a':
-           
+
             case 'w':
                 cmd = opt;
                 cmdCount++;
@@ -375,7 +375,7 @@ int main(int argc, char **argv) {
 
     configureLogging(logLevel, cmd == 'a');
 
-    switch (cmd) {		
+    switch (cmd) {
         case 'o':
             pImageInput->setOutputDir(outputDir);
             capture(pImageInput);
@@ -391,9 +391,9 @@ int main(int argc, char **argv) {
             break;
         case 'w':
             writeData(pImageInput);
-            break; 
-					
-			
+            break;
+
+
     }
 
     delete pImageInput;
